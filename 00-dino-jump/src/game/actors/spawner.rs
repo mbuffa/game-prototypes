@@ -53,7 +53,7 @@ impl Spawner {
       }
     }
     
-    if self.idle_for >= 1f32 {
+    if self.idle_for >= 2f32 {
       self.generate();
       self.idle_for = 0f32;
     } else {

@@ -4,7 +4,7 @@ pub struct Dino {
   pub rect: Rect,
   is_jumping: bool,
   jumped_at: Option<f32>,
-  
+  velocity: f32
 }
 
 impl Dino {
@@ -13,39 +13,33 @@ impl Dino {
     Self {
       rect: Rect::new(width, (screen_height() - height) * 0.5f32, width, height),
       is_jumping: false,
-      jumped_at: None
+      jumped_at: None,
+      velocity: 0f32
     }
   }
   
   pub fn update(&mut self, elapsed: f32) {
     if self.is_jumping == false && is_key_pressed(KeyCode::Space) {
       self.is_jumping = true;
+      self.velocity = 10.0;
     }
-    
+
     if self.is_jumping {
-      self.rect.y = (screen_height() - 180f32 - 120f32) * 0.5f32;
-      
       self.jumped_at = match self.jumped_at {
         None =>
-        Some(elapsed),
+          Some(elapsed),
         
         Some(delta_time) =>
-        if delta_time >= 0.6f32 {
-          self.is_jumping = false;
-          self.rect.y = (screen_height() - 120f32) * 0.5f32;
-          None
-        } else {
-          // TODO: Use cos() or sin() to get a smooth jump.
-          if delta_time <= 0.4f32 {
-            self.rect.y -= 10f32;
+          if delta_time >= 1.0f32 {
+            self.is_jumping = false;
+            self.velocity = 0f32;
+            self.rect.y = (screen_height() - 120f32) * 0.5f32;
+            None
+          } else {
+            self.rect.y -= self.velocity;
+            self.velocity -= 20f32 * elapsed;
+            Some(delta_time + elapsed)
           }
-          
-          if delta_time > 0.4f32 && delta_time < 0.6f32 {
-            self.rect.y += 20f32;
-          }
-          
-          Some(delta_time + elapsed)
-        }
       }
     }
   }

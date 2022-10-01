@@ -13,7 +13,7 @@ impl Obstacle {
   }
   
   pub fn update(&mut self, elapsed: f32) {
-    self.rect.x -= 1000f32 * elapsed;
+    self.rect.x -= 640f32 * elapsed;
   }
   
   pub fn draw(& self) {
