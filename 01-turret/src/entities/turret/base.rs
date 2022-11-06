@@ -1,4 +1,4 @@
-use macroquad::{prelude::*};
+use macroquad::prelude::*;
 
 pub struct Base {
   x: f32,

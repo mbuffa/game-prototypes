@@ -1,12 +1,10 @@
-use std::f32::consts::PI;
-
 use macroquad::{prelude::*};
 
 // Rotation direction. -1 means it'll initially go to the left.
 const ROT_DIRECTION: f32 = -1f32;
 
 // Rotation velocity, in degrees per second.
-const ROT_VELOCITY: f32 = 30f32;
+const ROT_VELOCITY: f32 = 45f32;
 
 // Left boundary, in degrees, relative to base angle.
 const LEFT_BOUNDARY: f32 = -60f32;
@@ -27,7 +25,7 @@ impl Sensor {
   pub fn new(x: f32, y: f32, angle: f32) -> Self {
     Self {
       x: x, y: y,
-      radius: 60f32,
+      radius: 240f32,
       base_angle: angle,
       angle: angle,
       rot_direction: ROT_DIRECTION
@@ -35,11 +33,12 @@ impl Sensor {
   }
 
   pub fn draw(&self) {
+    // println!("Sensor angle is: {}", self.angle);
     // draw_circle_lines(self.x, self.y, self.radius, 1f32, DARKGRAY);
     draw_arc_lines(self.x, self.y, self.radius, self.angle - 30f32, 1f32, DARKGRAY);
 
-    let rangle = (self.angle + 30f32) * PI / 180.0;
-    let langle = (self.angle - 30f32) * PI / 180.0;
+    let rangle = (self.angle + 30f32).to_radians();
+    let langle = (self.angle - 30f32).to_radians();
 
     draw_line(
       self.x, 
@@ -78,16 +77,6 @@ impl Sensor {
     }
 
     self.angle += self.rot_direction * ROT_VELOCITY * elapsed;
-
-    // let position = Vec2::from(mouse_position());
-
-    // let seen = self.sees(position);
-
-    // if seen {
-    //   println!("I saw the mouse!");
-    // } else {
-    //   println!("Beep...");
-    // }
   }
 
   pub fn sees(&self, other: Vec2) -> bool {
@@ -99,8 +88,8 @@ impl Sensor {
     // Calculate 3 areas: PAC, PBC, PAB.
     // Returns true if A = A1 + A2 + A3
     
-    let rangle = (self.angle + 30f32) * PI / 180.0;
-    let langle = (self.angle - 30f32) * PI / 180.0;
+    let rangle = (self.angle + 30f32).to_radians();
+    let langle = (self.angle - 30f32).to_radians();
     
     let x1 = self.x;
     let y1 = self.y;
