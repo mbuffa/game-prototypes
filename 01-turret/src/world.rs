@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+
+use macroquad::audio::Sound;
 use macroquad::prelude::*;
 use macroquad::rand::gen_range;
 
@@ -23,7 +26,8 @@ pub struct World {
   monsters: Vec<Monster>,
   missile_texture: Texture2D,
   monster_texture: Texture2D,
-  time_since_last_gen: f32
+  time_since_last_gen: f32,
+  soundbank: HashMap<String, Sound>
 }
 
 impl World {
@@ -44,8 +48,14 @@ impl World {
       monsters: Vec::new(),
       missile_texture,
       monster_texture,
-      time_since_last_gen: 0f32
+      time_since_last_gen: 0f32,
+      soundbank: HashMap::new()
     }
+  }
+
+  pub async fn load_assets(&mut self) {
+    let fire = macroquad::audio::load_sound("assets/pew.wav").await.expect("Failed lkoading 'pew'");
+    self.soundbank.insert("fire".to_owned(), fire);
   }
 
   pub fn draw(&self) {
@@ -60,6 +70,7 @@ impl World {
     for turret in self.turrets.iter_mut() {
       if turret.is_firing() {
         self.missiles.push(Missile::new(turret.get_cannon_end_x(), turret.get_cannon_end_y(), turret.get_cannon_angle(), MISSILE_VELOCITY));
+        Self::play_sound(&self.soundbank, "fire");
       }
       turret.update(&mut self.monsters.iter_mut(), dt);
     }
@@ -141,6 +152,15 @@ impl World {
       self.time_since_last_gen = 0f32;
     } else {
       self.time_since_last_gen += dt;
+    }
+  }
+
+  fn play_sound(bank: &HashMap<String, Sound>, name: &str) {
+    match bank.get(name) {
+      Some(sound) => {
+        macroquad::audio::play_sound_once(*sound);
+      },
+      None => {}
     }
   }
 }
