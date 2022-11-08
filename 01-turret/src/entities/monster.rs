@@ -34,7 +34,7 @@ impl Monster {
   }
 
   pub fn update(&mut self, elapsed: f32) {
-    self.collider.x += self.velocity * elapsed;
+    self.collider.y += self.velocity * elapsed;
   }
 
   pub fn identifier(&self) -> &String {

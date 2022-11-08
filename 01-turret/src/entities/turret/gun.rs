@@ -4,13 +4,16 @@ use macroquad::prelude::*;
 const ROT_DIRECTION: f32 = -1f32;
 
 // Rotation velocity, in degrees per second.
-const ROT_VELOCITY: f32 = 25f32;
+const ROT_VELOCITY: f32 = 18f32;
 
 // Left boundary, in degrees, relative to base angle.
 const LEFT_BOUNDARY: f32 = -60f32;
 
 // Right boundary, in degrees, relative to base angle.
 const RIGHT_BOUNDARY: f32 = 60f32;
+
+// Rate of fire, in seconds.
+const RATE_OF_FIRE: f32 = 1f32;
 
 pub struct Gun {
   x: f32,
@@ -20,7 +23,8 @@ pub struct Gun {
   texture: Texture2D,
   rot_direction: f32,
   target: Option<(String, Vec2)>,
-  is_firing: bool
+  is_firing: bool,
+  time_since_last_shot: f32
 }
 
 impl Gun {
@@ -36,7 +40,8 @@ impl Gun {
       texture,
       rot_direction: ROT_DIRECTION,
       target: None,
-      is_firing: false
+      is_firing: false,
+      time_since_last_shot: 0f32
     }
   }
 
@@ -72,6 +77,7 @@ impl Gun {
         }
     
         self.angle += self.rot_direction * ROT_VELOCITY * elapsed;
+        self.time_since_last_shot += elapsed;
       },
       Some((_target_identifier, target_vec)) => {
         let angle_to_target = Vec2::angle_between(
@@ -80,25 +86,26 @@ impl Gun {
         ).to_degrees();
 
         if angle_to_target.abs() < 0.010f32 {
-          self.is_firing = true;
+          self.maybe_fire(elapsed);
         } else {
-          // FIXME: This creates an abrupt jump to the target angle when nearing the target.
-          // Rework this part of the code to make it smoother, but not too slow.
-          if angle_to_target.abs() - ROT_VELOCITY <= 0f32 {
-            self.angle = self.angle + angle_to_target;
-            self.is_firing = true;
-          } else {
-            if angle_to_target <= 0f32 {
-              self.rot_direction = -1f32;
-            }
-            if angle_to_target >= 0f32 {
-              self.rot_direction = 1f32;
-            }
-  
-            self.angle += self.rot_direction * ROT_VELOCITY * elapsed;
-  
-            // println!("target: {}, angle: {}", angle_to_target.abs(), self.angle);
+          let mut rot_velocity = ROT_VELOCITY * elapsed;
+
+          if angle_to_target.abs() - rot_velocity <= 0f32 {
+            rot_velocity = angle_to_target;
+
+            self.maybe_fire(elapsed);
           }
+
+          if angle_to_target <= 0f32 {
+            self.rot_direction = -1f32;
+          }
+          if angle_to_target >= 0f32 {
+            self.rot_direction = 1f32;
+          }
+
+          self.angle += self.rot_direction * rot_velocity;
+          self.time_since_last_shot += elapsed;
+          // println!("target: {}, angle: {}", angle_to_target.abs(), self.angle);
         }
       }
     }
@@ -112,6 +119,15 @@ impl Gun {
   pub fn release_target(&mut self) {
     self.target = None;
     self.is_firing = false;
+  }
+
+  pub fn refresh_target_position(&mut self, new_target_vec: Vec2) {
+    match &self.target {
+      None => {},
+      Some((identifier, _old_target_vec)) => {
+        self.target = Some((identifier.clone(), new_target_vec));
+      }
+    }
   }
 
   pub fn get_target_identifier(&self) -> String {
@@ -134,6 +150,16 @@ impl Gun {
   }
 
   pub fn is_firing(&self) -> bool { self.is_firing }
+
+  fn maybe_fire(&mut self, dt: f32) {
+    if self.time_since_last_shot >= RATE_OF_FIRE {
+      self.is_firing = true;
+      self.time_since_last_shot = 0f32;
+    } else {
+      self.is_firing = false;
+      self.time_since_last_shot += dt;
+    }
+  }
 
   fn get_base_end_x(&self) -> f32 {
     self.x

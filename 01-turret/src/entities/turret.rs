@@ -62,8 +62,11 @@ impl Turret {
 
         let target_identifier = self.gun.get_target_identifier();
 
-        match monsters.find(|monster| *monster.identifier() == target_identifier) {
-          Some(_monster) => {},
+        // Refresh the gun's recorded target position, or release the target if it's not in reach.
+        match monsters.find(|monster| *monster.identifier() == target_identifier && monster.get_collider().y <= *self.base.y()) {
+          Some(monster) => {
+            self.gun.refresh_target_position(monster.get_collider().point().clone());
+          },
           None => self.stand_by()
         }
       },
