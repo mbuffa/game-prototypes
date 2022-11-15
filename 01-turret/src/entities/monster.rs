@@ -21,9 +21,9 @@ impl Monster {
     }
   }
 
-  pub fn draw(&self, texture: Texture2D) {
+  pub fn draw(&self, texture: &Texture2D) {
     draw_texture(
-      texture,
+      *texture,
       self.collider.x - (texture.width() / 2f32),
       self.collider.y - (texture.height() / 2f32),
       Color { r: 1.0, g: 1.0, b: 1.0, a: self.health as f32 / 100f32 }
