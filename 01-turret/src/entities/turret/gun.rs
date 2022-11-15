@@ -4,7 +4,7 @@ use macroquad::prelude::*;
 const ROT_DIRECTION: f32 = -1f32;
 
 // Rotation velocity, in degrees per second.
-const ROT_VELOCITY: f32 = 18f32;
+const ROT_VELOCITY: f32 = 45f32;
 
 // Left boundary, in degrees, relative to base angle.
 const LEFT_BOUNDARY: f32 = -60f32;
@@ -18,9 +18,10 @@ const RATE_OF_FIRE: f32 = 1f32;
 pub struct Gun {
   x: f32,
   y: f32,
+  width: f32,
+  height: f32,
   base_angle: f32,
   angle: f32,
-  texture: Texture2D,
   rot_direction: f32,
   target: Option<(String, Vec2)>,
   is_firing: bool,
@@ -28,16 +29,14 @@ pub struct Gun {
 }
 
 impl Gun {
-  pub fn new(x: f32, y: f32, angle: f32) -> Self {
-    let image = Image::gen_image_color(2, 12, WHITE);
-    let texture = Texture2D::from_image(&image);
-
+  pub fn new(x: f32, y: f32, width: f32, height: f32, angle: f32) -> Self {
     Self {
       x,
       y,
+      width,
+      height,
       base_angle: angle,
       angle,
-      texture,
       rot_direction: ROT_DIRECTION,
       target: None,
       is_firing: false,
@@ -45,10 +44,10 @@ impl Gun {
     }
   }
 
-  pub fn draw(&self) {
+  pub fn draw(&self, texture: &Texture2D) {
     draw_texture_ex(
-      self.texture,
-      self.get_base_end_x() - (self.texture.width() / 2f32),
+      *texture,
+      self.get_base_end_x() - ((*texture).width() / 2f32),
       self.get_base_end_y() ,
       WHITE,
       DrawTextureParams { rotation: (self.angle - 90f32).to_radians(), dest_size: None, source: None, flip_x: false, flip_y: false, pivot: Some(Vec2::new(self.x, self.y)) }
@@ -88,6 +87,9 @@ impl Gun {
         if angle_to_target.abs() < 0.010f32 {
           self.maybe_fire(elapsed);
         } else {
+          self.is_firing = false;
+          self.time_since_last_shot += elapsed;
+
           let mut rot_velocity = ROT_VELOCITY * elapsed;
 
           if angle_to_target.abs() - rot_velocity <= 0f32 {
@@ -104,7 +106,6 @@ impl Gun {
           }
 
           self.angle += self.rot_direction * rot_velocity;
-          self.time_since_last_shot += elapsed;
           // println!("target: {}, angle: {}", angle_to_target.abs(), self.angle);
         }
       }
@@ -153,11 +154,11 @@ impl Gun {
 
   fn maybe_fire(&mut self, dt: f32) {
     if self.time_since_last_shot >= RATE_OF_FIRE {
-      self.is_firing = true;
       self.time_since_last_shot = 0f32;
+      self.is_firing = true;
     } else {
-      self.is_firing = false;
       self.time_since_last_shot += dt;
+      self.is_firing = false;
     }
   }
 
@@ -170,11 +171,11 @@ impl Gun {
   }
 
   pub fn get_end_x(&self) -> f32 {
-    self.x + (self.texture.height() + 10f32) * (self.angle).to_radians().cos()
+    self.x + (self.height + 10f32) * (self.angle).to_radians().cos()
   }
 
   pub fn get_end_y(&self) -> f32 {
-    self.y + (self.texture.height() + 10f32) * (self.angle).to_radians().sin()
+    self.y + (self.height + 10f32) * (self.angle).to_radians().sin()
   }
 
   pub fn get_angle(&self) -> f32 { self.angle }

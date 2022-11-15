@@ -15,7 +15,7 @@ impl Monster {
     Self {
       identifier: uuid::Uuid::new_v4().to_string(),
       collider: Circle::new(x, y, 20f32),
-      velocity: velocity,
+      velocity,
       alive: true,
       health: 100
     }

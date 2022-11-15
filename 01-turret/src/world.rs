@@ -41,7 +41,7 @@ impl World {
   }
 
   pub fn draw(&self, asset_store: &AssetsStore) {
-    self.turrets.iter().for_each(|turret| turret.draw());
+    self.turrets.iter().for_each(|turret| turret.draw(asset_store));
     self.missiles.iter().for_each(|missile| missile.draw(asset_store.get_texture("missile")));
     self.monsters.iter().for_each(|monster| monster.draw(asset_store.get_texture("monster")));
   }
@@ -51,7 +51,12 @@ impl World {
 
     for turret in self.turrets.iter_mut() {
       if turret.is_firing() {
-        self.missiles.push(Missile::new(turret.get_cannon_end_x(), turret.get_cannon_end_y(), turret.get_cannon_angle(), MISSILE_VELOCITY));
+        self.missiles.push(Missile::new(
+          turret.get_cannon_end_x(),
+          turret.get_cannon_end_y(),
+          turret.get_cannon_angle(),
+          MISSILE_VELOCITY
+        ));
         asset_store.play_sound("fire");
       }
       turret.update(&mut self.monsters.iter_mut(), dt);

@@ -8,6 +8,7 @@ use base::Base;
 use gun::Gun;
 use sensor::Sensor;
 use crate::entities::monster::Monster;
+use crate::assets_store::AssetsStore;
 
 enum State {
   LookingForTarget,
@@ -27,15 +28,15 @@ impl Turret {
     Self {
       state: State::LookingForTarget,
       base: Base::new(x, y),
-      gun: Gun::new(x, y, angle),
+      gun: Gun::new(x, y, 2f32, 12f32, angle),
       sensor: Sensor::new(x, y, angle)
     }
   }
 
-  pub fn draw(& self) {
-    self.base.draw();
+  pub fn draw(& self, asset_store: &AssetsStore) {
+    self.base.draw(asset_store.get_texture("turret-base"));
     self.sensor.draw();
-    self.gun.draw();
+    self.gun.draw(asset_store.get_texture("turret-gun"));
   }
 
   pub fn update(&mut self, monsters: &mut std::slice::IterMut<'_, Monster>, dt:f32) {

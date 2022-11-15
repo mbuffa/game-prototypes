@@ -16,12 +16,20 @@ impl AssetsStore {
     let monster_image = Image::gen_image_color(40, 40, RED);
     let monster_texture = Texture2D::from_image(&monster_image);
 
+    let turret_base_image = Image::gen_image_color(10, 10, WHITE);
+    let turret_base_texture = Texture2D::from_image(&turret_base_image);
+
+    let turret_gun_image = Image::gen_image_color(2, 12, WHITE);
+    let turret_gun_texture = Texture2D::from_image(&turret_gun_image);
+
     let mut textures: HashMap<String, Texture2D> = HashMap::new();
     textures.insert("missile".to_owned(), missile_texture);
     textures.insert("monster".to_owned(), monster_texture);
+    textures.insert("turret-base".to_owned(), turret_base_texture);
+    textures.insert("turret-gun".to_owned(), turret_gun_texture);
 
     AssetsStore {
-      textures: textures,
+      textures,
       sounds: HashMap::new()
     }
   }
