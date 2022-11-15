@@ -86,12 +86,12 @@ impl World {
     let pos = mouse_position();
     // if let Some(turret) = self.turrets.first() {
     //   if is_mouse_button_pressed(MouseButton::Left) {
-    //     self.spawn_missile(
+    //     self.missiles.push(Missile::new(
     //       turret.get_cannon_end_x(),
     //       turret.get_cannon_end_y(),
     //       turret.get_cannon_angle(),
     //       MISSILE_VELOCITY
-    //     );
+    //     ));
     //   }
     // }
 
@@ -137,14 +137,14 @@ impl World {
 
   fn maybe_spawn_monsters(&mut self, dt: f32) {
     if self.time_since_last_gen >= MONSTER_SPAWN_RATE {
-      let total_slots = screen_width() / self.monster_texture.width();
       let to_generate = gen_range(1, MONSTER_SLOTS);
-      println!("To gen: {}", to_generate);
-      let spacing = total_slots / to_generate as f32 * self.monster_texture.width();
+      let slot_length: f32 = screen_width() / to_generate as f32;
 
-      for i in 2..(to_generate + 2) {
+      println!("To gen: {}", to_generate);
+
+      for i in 1..to_generate {
         self.spawn_monster(
-          i as f32 * spacing,
+          i as f32 * slot_length - (self.monster_texture.width()) * 0.5f32,
           -self.monster_texture.height(),
           MONSTER_VELOCITY
         );
