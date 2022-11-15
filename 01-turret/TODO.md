@@ -9,7 +9,7 @@
   * Reset/game over when a monster reaches the bottom.
   * Score over time, plus a bonus for a killed monster.
   * Have reliable monster spawns.
-* [ ] Debug a "rare" occurrence of a turret shooting many projectiles at the same time.
+* [x] Debug a "rare" occurrence of a turret shooting many projectiles at the same time.
 * [x] Debug monster spawns.
-* [ ] Refactor Assets management.
+* [x] Refactor Assets management.
 * [ ] Implement a soft target release mechanism; after a short period of no longer detecting the target, the turret should be put in stand by (instead of checking coordinates manually).
