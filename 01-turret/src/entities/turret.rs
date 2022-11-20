@@ -7,6 +7,7 @@ mod sensor;
 use base::Base;
 use gun::Gun;
 use sensor::Sensor;
+use uuid::Uuid;
 use crate::entities::monster::Monster;
 use crate::assets_store::AssetsStore;
 
@@ -16,20 +17,30 @@ enum State {
   ManualOverride
 }
 
+#[derive(Clone)]
+pub enum GunType {
+  Missile,
+  Laser
+}
+
 pub struct Turret {
   state: State,
   base: Base,
   gun: Gun,
-  sensor: Sensor
+  sensor: Sensor,
+  gun_type: GunType,
+  identifier: String
 }
 
 impl Turret {
-  pub fn new(x: f32, y: f32, angle: f32) -> Self {
+  pub fn new(x: f32, y: f32, angle: f32, gun_type: GunType) -> Self {
     Self {
       state: State::LookingForTarget,
       base: Base::new(x, y),
-      gun: Gun::new(x, y, 2f32, 12f32, angle),
-      sensor: Sensor::new(x, y, angle)
+      gun: Gun::new(x, y, 2f32, 12f32, angle, gun_type.clone()),
+      sensor: Sensor::new(x, y, angle),
+      gun_type: gun_type,
+      identifier: Uuid::new_v4().to_string()
     }
   }
 
@@ -39,14 +50,14 @@ impl Turret {
     self.gun.draw(asset_store.get_texture("turret-gun"));
   }
 
-  pub fn update(&mut self, monsters: &mut std::slice::IterMut<'_, Monster>, dt:f32) {
+  pub fn update(&mut self, monsters: &mut std::slice::IterMut<'_, Monster>, dt:f32, asset_store: &AssetsStore) {
     match self.state {
       State::LookingForTarget => {
         if is_key_pressed(KeyCode::Escape) {
           self.state = State::ManualOverride;
         }
 
-        self.gun.update(dt);
+        self.gun.update(dt, asset_store);
         self.sensor.update(dt);
 
         let potential_target = monsters.find(|monster| self.sees_hostile_targets(monster));
@@ -59,7 +70,8 @@ impl Turret {
         }
       },
       State::TargetAcquired => {
-        self.gun.update(dt);
+        self.gun.update(dt, asset_store);
+        // self.sensor.update(dt);
 
         let target_identifier = self.gun.get_target_identifier();
 
@@ -98,16 +110,19 @@ impl Turret {
   pub fn is_firing(&self) -> bool { self.gun.is_firing() }
 
   pub fn acquire_target(&mut self, target_identifier: &String, target_vec: Vec2) {
-    println!("Acquiring target.");
+    // println!("Acquiring target.");
     self.state = State::TargetAcquired;
     self.gun.acquire_target(target_identifier, target_vec);
   }
 
   pub fn stand_by(&mut self) {
-    println!("Standing by.");
+    // println!("Standing by.");
     self.state = State::LookingForTarget;
     self.gun.release_target();
   }
+
+  pub fn get_gun_type(&self) -> &GunType { &self.gun_type }
+  pub fn get_identifier(&self) -> &String { &self.identifier }
 
   pub fn get_cannon_angle(&self) -> f32 {
     self.gun.get_angle()
@@ -119,5 +134,13 @@ impl Turret {
 
   pub fn get_cannon_end_y(&self) -> f32 {
     self.gun.get_end_y()
+  }
+
+  pub fn get_target_position(&self) -> Option<Vec2> {
+    match &self.gun.get_target_position() {
+      None => None,
+      Some(position) => Some(position.clone())
+    }
+    // self.gun.get_target()
   }
 }

@@ -1,5 +1,9 @@
 use macroquad::prelude::*;
 
+use crate::assets_store::AssetsStore;
+
+use super::GunType;
+
 // Rotation direction. -1 means it'll initially go to the left.
 const ROT_DIRECTION: f32 = -1f32;
 
@@ -25,11 +29,12 @@ pub struct Gun {
   rot_direction: f32,
   target: Option<(String, Vec2)>,
   is_firing: bool,
-  time_since_last_shot: f32
+  time_since_last_shot: f32,
+  gun_type: GunType
 }
 
 impl Gun {
-  pub fn new(x: f32, y: f32, width: f32, height: f32, angle: f32) -> Self {
+  pub fn new(x: f32, y: f32, width: f32, height: f32, angle: f32, gun_type: GunType) -> Self {
     Self {
       x,
       y,
@@ -40,7 +45,8 @@ impl Gun {
       rot_direction: ROT_DIRECTION,
       target: None,
       is_firing: false,
-      time_since_last_shot: 0f32
+      time_since_last_shot: 0f32,
+      gun_type
     }
   }
 
@@ -64,7 +70,7 @@ impl Gun {
     // );
   }
 
-  pub fn update(&mut self, elapsed: f32) {
+  pub fn update(&mut self, elapsed: f32, asset_store: &AssetsStore) {
     match &self.target {
       None => {
         if self.angle <= self.base_angle + LEFT_BOUNDARY {
@@ -85,7 +91,7 @@ impl Gun {
         ).to_degrees();
 
         if angle_to_target.abs() < 0.010f32 {
-          self.maybe_fire(elapsed);
+          self.maybe_fire(elapsed, asset_store);
         } else {
           self.is_firing = false;
           self.time_since_last_shot += elapsed;
@@ -95,7 +101,7 @@ impl Gun {
           if angle_to_target.abs() - rot_velocity <= 0f32 {
             rot_velocity = angle_to_target;
 
-            self.maybe_fire(elapsed);
+            self.maybe_fire(elapsed, asset_store);
           }
 
           if angle_to_target <= 0f32 {
@@ -113,7 +119,7 @@ impl Gun {
   }
 
   pub fn acquire_target(&mut self, target_identifier: &String, target_vec: Vec2) {
-    println!("Acquiring target {} {}", target_identifier, target_vec);
+    // println!("Acquiring target {} {}", target_identifier, target_vec);
     self.target = Some((target_identifier.clone(), target_vec));
   }
 
@@ -140,6 +146,15 @@ impl Gun {
     }
   }
 
+  pub fn get_target_position(&self) -> Option<Vec2> {
+    match &self.target {
+      None => None,
+      Some((_target_identifier, position)) => {
+        Some(position.clone())
+      }
+    }
+  }
+
   pub fn turn_left(&mut self, dt: f32) {
     self.rot_direction = -1f32;
     self.angle += self.rot_direction * ROT_VELOCITY * dt;
@@ -152,13 +167,21 @@ impl Gun {
 
   pub fn is_firing(&self) -> bool { self.is_firing }
 
-  fn maybe_fire(&mut self, dt: f32) {
-    if self.time_since_last_shot >= RATE_OF_FIRE {
-      self.time_since_last_shot = 0f32;
-      self.is_firing = true;
-    } else {
-      self.time_since_last_shot += dt;
-      self.is_firing = false;
+  fn maybe_fire(&mut self, dt: f32, asset_store: &AssetsStore) {
+    match self.gun_type {
+      GunType::Missile => {
+        if self.time_since_last_shot >= RATE_OF_FIRE {
+          self.time_since_last_shot = 0f32;
+          self.is_firing = true;
+          asset_store.play_sound("fire");
+        } else {
+          self.time_since_last_shot += dt;
+          self.is_firing = false;
+        }
+      },
+      GunType::Laser => {
+        self.is_firing = true;
+      }
     }
   }
 
@@ -171,11 +194,11 @@ impl Gun {
   }
 
   pub fn get_end_x(&self) -> f32 {
-    self.x + (self.height + 10f32) * (self.angle).to_radians().cos()
+    self.x + (self.height) * (self.angle).to_radians().cos()
   }
 
   pub fn get_end_y(&self) -> f32 {
-    self.y + (self.height + 10f32) * (self.angle).to_radians().sin()
+    self.y + (self.height) * (self.angle).to_radians().sin()
   }
 
   pub fn get_angle(&self) -> f32 { self.angle }

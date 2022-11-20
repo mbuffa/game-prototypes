@@ -37,6 +37,9 @@ impl AssetsStore {
   pub async fn load_assets(&mut self) {
     let fire = macroquad::audio::load_sound("assets/pew.wav").await.expect("Failed lkoading 'pew'");
     self.sounds.insert("fire".to_owned(), fire);
+
+    let fire_zzz = macroquad::audio::load_sound("assets/zzz.wav").await.expect("Failed lkoading 'zzz'");
+    self.sounds.insert("fire_zzz".to_owned(), fire_zzz);
   }
 
   pub fn get_texture(&self, name: &str) -> &Texture2D {

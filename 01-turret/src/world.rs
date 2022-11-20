@@ -1,9 +1,12 @@
+use std::collections::HashMap;
+
 use macroquad::prelude::*;
 use macroquad::rand::gen_range;
 
 use crate::assets_store::AssetsStore;
 
-use crate::entities::turret::Turret;
+use crate::entities::turret::{Turret, GunType};
+use crate::entities::laser:: Laser;
 use crate::entities::missile::Missile;
 use crate::entities::monster::Monster;
 
@@ -19,23 +22,24 @@ const MONSTER_SLOTS: u8 = 5;
 // Monster rate of spawn, in seconds, and for each wave.
 const MONSTER_SPAWN_RATE: f32 = 5f32;
 
+const MISSILE_DAMAGE: u8 = 20;
+const LASER_DAMAGE: u8 = 2;
+
 pub struct World {
   turrets: Vec<Turret>,
   missiles: Vec<Missile>,
+  lasers: HashMap<String, Laser>,
   monsters: Vec<Monster>,
   time_since_last_gen: f32,
 }
 
 impl World {
   pub fn new() -> Self {
-    let turret = Turret::new(screen_width() / 2f32, screen_height() / 2f32, FACING_NORTH);
-    let mut turrets = Vec::new();
-    turrets.push(turret);
-
     Self {
-      turrets,
+      turrets: Vec::new(),
       missiles: Vec::new(),
       monsters: Vec::new(),
+      lasers: HashMap::new(),
       time_since_last_gen: 0f32,
     }
   }
@@ -44,6 +48,7 @@ impl World {
     self.turrets.iter().for_each(|turret| turret.draw(asset_store));
     self.missiles.iter().for_each(|missile| missile.draw(asset_store.get_texture("missile")));
     self.monsters.iter().for_each(|monster| monster.draw(asset_store.get_texture("monster")));
+    self.lasers.iter().for_each(|(k, v)| v.draw());
   }
 
   pub fn update(&mut self, asset_store: &AssetsStore) {
@@ -51,15 +56,39 @@ impl World {
 
     for turret in self.turrets.iter_mut() {
       if turret.is_firing() {
-        self.missiles.push(Missile::new(
-          turret.get_cannon_end_x(),
-          turret.get_cannon_end_y(),
-          turret.get_cannon_angle(),
-          MISSILE_VELOCITY
-        ));
-        asset_store.play_sound("fire");
+        match turret.get_gun_type() {
+          GunType::Missile => {
+            self.missiles.push(Missile::new(
+              turret.get_cannon_end_x(),
+              turret.get_cannon_end_y(),
+              turret.get_cannon_angle(),
+              MISSILE_VELOCITY
+            ));
+          },
+          GunType::Laser => {
+            match turret.get_target_position() {
+              None => panic!("Woops!"),
+              Some(position) => {
+                asset_store.play_sound("fire_zzz");
+                self.lasers.insert(turret.get_identifier().clone(), Laser::new(
+                  turret.get_cannon_end_x(),
+                  turret.get_cannon_end_y(),
+                  position.x,
+                  position.y
+                ));
+              }
+            }
+          }
+        }
+      } else {
+        match turret.get_gun_type() {
+          GunType::Missile => {},
+          GunType::Laser => {
+            self.lasers.remove(turret.get_identifier());
+          }
+        }
       }
-      turret.update(&mut self.monsters.iter_mut(), dt);
+      turret.update(&mut self.monsters.iter_mut(), dt, &asset_store);
     }
     
     // Missiles handling
@@ -82,9 +111,15 @@ impl World {
     //   }
     // }
 
+    if is_mouse_button_pressed(MouseButton::Left) {
+      self.turrets.push(Turret::new(
+        pos.0, pos.1, FACING_NORTH, GunType::Missile
+      ));
+    }
+
     if is_mouse_button_pressed(MouseButton::Right) {
       self.turrets.push(Turret::new(
-        pos.0, pos.1, FACING_NORTH
+        pos.0, pos.1, FACING_NORTH, GunType::Laser
       ));
     }
 
@@ -105,12 +140,20 @@ impl World {
     self.monsters.iter_mut().for_each(|monster| {
       self.missiles.iter_mut().for_each(|missile| {
         if monster.get_collider().overlaps(missile.get_collider()) {
-          monster.hit();
+          monster.hit(MISSILE_DAMAGE);
           missile.destroy();
         }
       });
 
+      self.lasers.iter().for_each(|(_identifier, laser)| {
+        if monster.get_collider().contains(laser.get_target_position()) {
+          monster.hit(LASER_DAMAGE);
+        }
+      });
+
       monster.update(dt);
+
+      // println!("Lasers: {}", self.lasers.len());
     });
   }
 
@@ -129,7 +172,7 @@ impl World {
       let to_generate = gen_range(1, MONSTER_SLOTS);
       let slot_length: f32 = screen_width() / to_generate as f32;
 
-      println!("To gen: {}", to_generate);
+      // println!("To gen: {}", to_generate);
 
       for i in 1..to_generate {
         self.spawn_monster(

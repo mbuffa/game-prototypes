@@ -7,7 +7,7 @@ pub struct Monster {
   collider: Circle,
   velocity: f32,
   alive: bool,
-  health: u8
+  health: i16
 }
 
 impl Monster {
@@ -37,9 +37,7 @@ impl Monster {
     self.collider.y += self.velocity * elapsed;
   }
 
-  pub fn identifier(&self) -> &String {
-    &self.identifier
-  }
+  pub fn identifier(&self) -> &String { &self.identifier }
 
   pub fn is_alive(&self) -> bool {
     self.alive
@@ -49,11 +47,11 @@ impl Monster {
     self.alive = false;
   }
 
-  pub fn hit(&mut self) {
-    if self.health == 0 {
+  pub fn hit(&mut self, amount: u8) {
+    if self.health <= 0 {
       self.destroy();
     } else {
-      self.health -= 20;
+      self.health -= amount as i16;
     }
   }
 

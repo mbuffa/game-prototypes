@@ -5,11 +5,17 @@
   * [x] One for firing a projectile
   * [ ] One when a projectile reaches its target
   * [ ] One when a monster dies
-* [ ] Add "real" game mechanics:
-  * Reset/game over when a monster reaches the bottom.
-  * Score over time, plus a bonus for a killed monster.
-  * Have reliable monster spawns.
+* Add "real" game mechanics:
+  * [ ] Implement cooldowns on turret deployments
+  * [ ] Reset/game over when a monster reaches the bottom.
+  * [ ] Score over time, plus a bonus for a killed monster.
+  * [ ] Have reliable monster spawns.
 * [x] Debug a "rare" occurrence of a turret shooting many projectiles at the same time.
 * [x] Debug monster spawns.
 * [x] Refactor Assets management.
 * [ ] Implement a soft target release mechanism; after a short period of no longer detecting the target, the turret should be put in stand by (instead of checking coordinates manually).
+* [ ] Implement a "smart grid" so that a turret shares information on targets once detected.
+* [x] Implement laser turrets.
+* [ ] Debug laser collision detection.
+* [ ] Improve target detection (it's only using the center of the target right now).
+  * Replace check using the center pixel by the closest edge pixel.
