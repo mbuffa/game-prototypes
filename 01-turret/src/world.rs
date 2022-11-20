@@ -188,14 +188,12 @@ impl World {
   }
 
   fn new_identifier(&self, _gen_type: &str) -> String {
-    // let seed1 = get_time() as u64;
-    // let seed2 = oorandom::Rand32::new(seed1).rand_range(0..65536) as u64;
-    // let random = oorandom::Rand32::new(seed1 + seed2).rand_u32() + get_fps() as u32;
-
-    macroquad::rand::rand().to_string()
-
-    // println!("Generated {}", random);
-    // random.to_string()
+    [
+      macroquad::rand::rand().to_string(),
+      macroquad::rand::rand().to_string(),
+      macroquad::rand::rand().to_string(),
+      macroquad::rand::rand().to_string()
+    ].join("-")
   }
 
 }
