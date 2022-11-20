@@ -1,7 +1,5 @@
 use macroquad::prelude::*;
 
-use uuid;
-
 pub struct Monster {
   identifier: String,
   collider: Circle,
@@ -11,9 +9,9 @@ pub struct Monster {
 }
 
 impl Monster {
-  pub fn new(x: f32, y: f32, velocity: f32) -> Self {
+  pub fn new(identifier: String, x: f32, y: f32, velocity: f32) -> Self {
     Self {
-      identifier: uuid::Uuid::new_v4().to_string(),
+      identifier,
       collider: Circle::new(x, y, 20f32),
       velocity,
       alive: true,

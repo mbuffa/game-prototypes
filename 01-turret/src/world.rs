@@ -113,13 +113,13 @@ impl World {
 
     if is_mouse_button_pressed(MouseButton::Left) {
       self.turrets.push(Turret::new(
-        pos.0, pos.1, FACING_NORTH, GunType::Missile
+        self.new_identifier("turret"), pos.0, pos.1, FACING_NORTH, GunType::Missile
       ));
     }
 
     if is_mouse_button_pressed(MouseButton::Right) {
       self.turrets.push(Turret::new(
-        pos.0, pos.1, FACING_NORTH, GunType::Laser
+        self.new_identifier("turret"), pos.0, pos.1, FACING_NORTH, GunType::Laser
       ));
     }
 
@@ -162,7 +162,7 @@ impl World {
   // }
 
   pub fn spawn_monster(&mut self, x: f32, y: f32, velocity: f32) {
-    self.monsters.push(Monster::new(x, y, velocity));
+    self.monsters.push(Monster::new(self.new_identifier("monster"), x, y, velocity));
   }
 
   fn maybe_spawn_monsters(&mut self, dt: f32, asset_store: &AssetsStore) {
@@ -185,6 +185,17 @@ impl World {
     } else {
       self.time_since_last_gen += dt;
     }
+  }
+
+  fn new_identifier(&self, _gen_type: &str) -> String {
+    // let seed1 = get_time() as u64;
+    // let seed2 = oorandom::Rand32::new(seed1).rand_range(0..65536) as u64;
+    // let random = oorandom::Rand32::new(seed1 + seed2).rand_u32() + get_fps() as u32;
+
+    macroquad::rand::rand().to_string()
+
+    // println!("Generated {}", random);
+    // random.to_string()
   }
 
 }

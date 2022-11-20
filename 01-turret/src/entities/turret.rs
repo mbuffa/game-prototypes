@@ -7,7 +7,6 @@ mod sensor;
 use base::Base;
 use gun::Gun;
 use sensor::Sensor;
-use uuid::Uuid;
 use crate::entities::monster::Monster;
 use crate::assets_store::AssetsStore;
 
@@ -24,23 +23,23 @@ pub enum GunType {
 }
 
 pub struct Turret {
+  identifier: String,
   state: State,
   base: Base,
   gun: Gun,
   sensor: Sensor,
-  gun_type: GunType,
-  identifier: String
+  gun_type: GunType
 }
 
 impl Turret {
-  pub fn new(x: f32, y: f32, angle: f32, gun_type: GunType) -> Self {
+  pub fn new(identifier: String, x: f32, y: f32, angle: f32, gun_type: GunType) -> Self {
     Self {
+      identifier,
       state: State::LookingForTarget,
       base: Base::new(x, y),
       gun: Gun::new(x, y, 2f32, 12f32, angle, gun_type.clone()),
       sensor: Sensor::new(x, y, angle),
-      gun_type: gun_type,
-      identifier: Uuid::new_v4().to_string()
+      gun_type: gun_type
     }
   }
 
