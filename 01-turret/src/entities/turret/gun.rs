@@ -73,15 +73,6 @@ impl Gun {
   pub fn update(&mut self, elapsed: f32, asset_store: &AssetsStore) {
     match &self.target {
       None => {
-        if self.angle <= self.base_angle + LEFT_BOUNDARY {
-          self.rot_direction = 1f32;
-        }
-    
-        if self.angle >= self.base_angle + RIGHT_BOUNDARY {
-          self.rot_direction = -1f32;
-        }
-    
-        self.angle += self.rot_direction * ROT_VELOCITY * elapsed;
         self.time_since_last_shot += elapsed;
       },
       Some((_target_identifier, target_vec)) => {

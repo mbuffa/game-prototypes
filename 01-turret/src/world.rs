@@ -18,9 +18,9 @@ const FACING_NORTH: f32 = -90f32;
 const MISSILE_VELOCITY: f32 = 200f32;
 const MONSTER_VELOCITY: f32 = 40f32;
 
-const MONSTER_SLOTS: u8 = 5;
+const MONSTER_SLOTS: u8 = 10;
 // Monster rate of spawn, in seconds, and for each wave.
-const MONSTER_SPAWN_RATE: f32 = 5f32;
+const MONSTER_SPAWN_RATE: f32 = 4f32;
 
 const MISSILE_DAMAGE: u8 = 20;
 const LASER_DAMAGE: u8 = 2;
