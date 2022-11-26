@@ -3,10 +3,13 @@ use macroquad::prelude::*;
 mod base;
 mod gun;
 mod sensor;
+pub mod fire_mode;
+mod rate_timer;
 
 use base::Base;
 use gun::Gun;
 use sensor::Sensor;
+use fire_mode::FireMode;
 use crate::entities::monster::Monster;
 use crate::assets_store::AssetsStore;
 
@@ -32,14 +35,14 @@ pub struct Turret {
 }
 
 impl Turret {
-  pub fn new(identifier: String, x: f32, y: f32, angle: f32, gun_type: GunType) -> Self {
+  pub fn new(identifier: String, x: f32, y: f32, angle: f32, gun_type: GunType, fire_mode: FireMode) -> Self {
     Self {
       identifier,
       state: State::LookingForTarget,
       base: Base::new(x, y),
-      gun: Gun::new(x, y, 2f32, 12f32, angle, gun_type.clone()),
+      gun: Gun::new(x, y, 2f32, 12f32, angle, gun_type.clone(), fire_mode),
       sensor: Sensor::new(x, y, angle),
-      gun_type: gun_type
+      gun_type
     }
   }
 

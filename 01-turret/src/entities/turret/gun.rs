@@ -3,6 +3,8 @@ use macroquad::prelude::*;
 use crate::assets_store::AssetsStore;
 
 use super::GunType;
+use super::fire_mode::FireMode;
+use super::rate_timer::RateTimer;
 
 // Rotation direction. -1 means it'll initially go to the left.
 const ROT_DIRECTION: f32 = -1f32;
@@ -10,43 +12,30 @@ const ROT_DIRECTION: f32 = -1f32;
 // Rotation velocity, in degrees per second.
 const ROT_VELOCITY: f32 = 45f32;
 
-// Left boundary, in degrees, relative to base angle.
-const LEFT_BOUNDARY: f32 = -60f32;
-
-// Right boundary, in degrees, relative to base angle.
-const RIGHT_BOUNDARY: f32 = 60f32;
-
-// Rate of fire, in seconds.
-const RATE_OF_FIRE: f32 = 1f32;
-
 pub struct Gun {
   x: f32,
   y: f32,
-  width: f32,
   height: f32,
-  base_angle: f32,
   angle: f32,
   rot_direction: f32,
   target: Option<(String, Vec2)>,
   is_firing: bool,
-  time_since_last_shot: f32,
-  gun_type: GunType
+  gun_type: GunType,
+  rate_timer: RateTimer
 }
 
 impl Gun {
-  pub fn new(x: f32, y: f32, width: f32, height: f32, angle: f32, gun_type: GunType) -> Self {
+  pub fn new(x: f32, y: f32, _width: f32, height: f32, angle: f32, gun_type: GunType, fire_mode: FireMode) -> Self {
     Self {
       x,
       y,
-      width,
       height,
-      base_angle: angle,
       angle,
       rot_direction: ROT_DIRECTION,
       target: None,
       is_firing: false,
-      time_since_last_shot: 0f32,
-      gun_type
+      gun_type,
+      rate_timer: RateTimer::new(fire_mode)
     }
   }
 
@@ -71,9 +60,12 @@ impl Gun {
   }
 
   pub fn update(&mut self, elapsed: f32, asset_store: &AssetsStore) {
+    self.rate_timer.update(elapsed);
+
     match &self.target {
       None => {
-        self.time_since_last_shot += elapsed;
+        // self.time_since_last_shot += elapsed;
+        self.rate_timer.increment(elapsed);
       },
       Some((_target_identifier, target_vec)) => {
         let angle_to_target = Vec2::angle_between(
@@ -85,7 +77,7 @@ impl Gun {
           self.maybe_fire(elapsed, asset_store);
         } else {
           self.is_firing = false;
-          self.time_since_last_shot += elapsed;
+          self.rate_timer.increment(elapsed);
 
           let mut rot_velocity = ROT_VELOCITY * elapsed;
 
@@ -161,12 +153,12 @@ impl Gun {
   fn maybe_fire(&mut self, dt: f32, asset_store: &AssetsStore) {
     match self.gun_type {
       GunType::Missile => {
-        if self.time_since_last_shot >= RATE_OF_FIRE {
-          self.time_since_last_shot = 0f32;
+        if self.rate_timer.can_shoot() {
+          self.rate_timer.reset();
           self.is_firing = true;
           asset_store.play_sound("fire");
         } else {
-          self.time_since_last_shot += dt;
+          self.rate_timer.increment(dt);
           self.is_firing = false;
         }
       },

@@ -5,6 +5,7 @@ use macroquad::rand::gen_range;
 
 use crate::assets_store::AssetsStore;
 
+use crate::entities::turret;
 use crate::entities::turret::{Turret, GunType};
 use crate::entities::laser:: Laser;
 use crate::entities::missile::Missile;
@@ -20,7 +21,7 @@ const MONSTER_VELOCITY: f32 = 40f32;
 
 const MONSTER_SLOTS: u8 = 10;
 // Monster rate of spawn, in seconds, and for each wave.
-const MONSTER_SPAWN_RATE: f32 = 4f32;
+const MONSTER_SPAWN_RATE: f32 = 2f32;
 
 const MISSILE_DAMAGE: u8 = 20;
 const LASER_DAMAGE: u8 = 2;
@@ -48,7 +49,7 @@ impl World {
     self.turrets.iter().for_each(|turret| turret.draw(asset_store));
     self.missiles.iter().for_each(|missile| missile.draw(asset_store.get_texture("missile")));
     self.monsters.iter().for_each(|monster| monster.draw(asset_store.get_texture("monster")));
-    self.lasers.iter().for_each(|(k, v)| v.draw());
+    self.lasers.iter().for_each(|(_k, v)| v.draw());
   }
 
   pub fn update(&mut self, asset_store: &AssetsStore) {
@@ -113,13 +114,13 @@ impl World {
 
     if is_mouse_button_pressed(MouseButton::Left) {
       self.turrets.push(Turret::new(
-        self.new_identifier("turret"), pos.0, pos.1, FACING_NORTH, GunType::Missile
+        self.new_identifier("turret"), pos.0, pos.1, FACING_NORTH, GunType::Missile, turret::fire_mode::FireMode::Burst
       ));
     }
 
     if is_mouse_button_pressed(MouseButton::Right) {
       self.turrets.push(Turret::new(
-        self.new_identifier("turret"), pos.0, pos.1, FACING_NORTH, GunType::Laser
+        self.new_identifier("turret"), pos.0, pos.1, FACING_NORTH, GunType::Laser, turret::fire_mode::FireMode::Normal
       ));
     }
 

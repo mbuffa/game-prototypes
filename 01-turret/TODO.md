@@ -19,3 +19,4 @@
 * [ ] Debug laser collision detection.
 * [ ] Improve target detection (it's only using the center of the target right now).
   * Replace check using the center pixel by the closest edge pixel.
+* [x] Implement a custom fire mode, normal or burst
