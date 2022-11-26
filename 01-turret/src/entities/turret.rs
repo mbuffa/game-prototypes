@@ -67,6 +67,7 @@ impl Turret {
         match potential_target {
           None => {},
           Some(monster) => {
+            asset_store.play_sound("spotted");
             self.acquire_target(monster.identifier(), monster.get_collider().point());
           },
         }

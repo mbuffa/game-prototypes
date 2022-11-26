@@ -137,12 +137,19 @@ impl World {
     //   );
     // }
 
-    self.monsters.retain(|monster| monster.get_collider().y <= screen_height() && monster.is_alive());
+    self.monsters.retain(|monster| {
+      if !monster.is_alive() {
+        asset_store.play_sound("death");
+      }
+      monster.get_collider().y <= screen_height() && monster.is_alive()
+    });
+
     self.monsters.iter_mut().for_each(|monster| {
       self.missiles.iter_mut().for_each(|missile| {
         if monster.get_collider().overlaps(missile.get_collider()) {
           monster.hit(MISSILE_DAMAGE);
           missile.destroy();
+          asset_store.play_sound("impact")
         }
       });
 

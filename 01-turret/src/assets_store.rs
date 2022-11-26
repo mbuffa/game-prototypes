@@ -35,11 +35,20 @@ impl AssetsStore {
   }
 
   pub async fn load_assets(&mut self) {
-    let fire = macroquad::audio::load_sound("assets/pew.wav").await.expect("Failed lkoading 'pew'");
+    let fire = macroquad::audio::load_sound("assets/tff.wav").await.expect("Failed lkoading 'pew'");
     self.sounds.insert("fire".to_owned(), fire);
 
-    let fire_zzz = macroquad::audio::load_sound("assets/zzz.wav").await.expect("Failed lkoading 'zzz'");
-    self.sounds.insert("fire_zzz".to_owned(), fire_zzz);
+    let laser = macroquad::audio::load_sound("assets/fff.wav").await.expect("Failed lkoading 'zzz'");
+    self.sounds.insert("laser".to_owned(), laser);
+
+    let death = macroquad::audio::load_sound("assets/argh.wav").await.expect("Failed lkoading 'pew'");
+    self.sounds.insert("death".to_owned(), death);
+
+    let impact = macroquad::audio::load_sound("assets/poof.wav").await.expect("Failed lkoading 'pew'");
+    self.sounds.insert("impact".to_owned(), impact);
+
+    let spotted = macroquad::audio::load_sound("assets/spotted.wav").await.expect("Failed lkoading 'pew'");
+    self.sounds.insert("spotted".to_owned(), spotted);
   }
 
   pub fn get_texture(&self, name: &str) -> &Texture2D {
