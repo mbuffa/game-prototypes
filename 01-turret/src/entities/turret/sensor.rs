@@ -24,10 +24,10 @@ pub struct Sensor {
 impl Sensor {
   pub fn new(x: f32, y: f32, angle: f32) -> Self {
     Self {
-      x: x, y: y,
+      x, y,
       radius: 240f32,
       base_angle: angle,
-      angle: angle,
+      angle,
       rot_direction: ROT_DIRECTION
     }
   }
@@ -77,6 +77,36 @@ impl Sensor {
     }
 
     self.angle += self.rot_direction * ROT_VELOCITY * elapsed;
+  }
+
+  pub fn rotate_towards(&mut self, target_position: &Vec2, dt: f32) {
+    let angle_to_target = Vec2::angle_between(
+      Vec2::new(self.x - self.get_end_x(), self.y - self.get_end_y()),
+      Vec2::new(self.x - target_position.x, self.y - target_position.y)
+    ).to_degrees();
+    
+    let mut rot_velocity = ROT_VELOCITY * dt;
+
+    if angle_to_target.abs() - rot_velocity <= 0f32 {
+      rot_velocity = angle_to_target;
+    }
+
+    if angle_to_target <= 0f32 {
+      self.rot_direction = -1f32;
+    }
+    if angle_to_target >= 0f32 {
+      self.rot_direction = 1f32;
+    }
+
+    self.angle += self.rot_direction * rot_velocity;
+  }
+
+  pub fn get_end_x(&self) -> f32 {
+    self.x + (self.radius) * (self.angle).to_radians().cos()
+  }
+
+  pub fn get_end_y(&self) -> f32 {
+    self.y + (self.radius) * (self.angle).to_radians().sin()
   }
 
   pub fn sees(&self, other: Vec2) -> bool {

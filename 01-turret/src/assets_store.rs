@@ -10,10 +10,10 @@ pub struct AssetsStore {
 
 impl AssetsStore {
   pub fn new() -> Self {
-    let missile_image = Image::gen_image_color(4, 4, ORANGE);
+    let missile_image = Image::gen_image_color(4, 4, WHITE);
     let missile_texture = Texture2D::from_image(&missile_image);
 
-    let monster_image = Image::gen_image_color(40, 40, RED);
+    let monster_image = Image::gen_image_color(40, 40, WHITE);
     let monster_texture = Texture2D::from_image(&monster_image);
 
     let turret_base_image = Image::gen_image_color(10, 10, WHITE);
@@ -61,7 +61,7 @@ impl AssetsStore {
   pub fn play_sound(&self, name: &str) {
     match self.sounds.get(name) {
       Some(sound) => {
-        macroquad::audio::play_sound_once(*sound);
+        // macroquad::audio::play_sound_once(*sound);
       },
       None => {}
     }

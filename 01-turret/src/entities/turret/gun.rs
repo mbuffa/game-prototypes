@@ -138,6 +138,8 @@ impl Gun {
     }
   }
 
+
+  
   pub fn turn_left(&mut self, dt: f32) {
     self.rot_direction = -1f32;
     self.angle += self.rot_direction * ROT_VELOCITY * dt;

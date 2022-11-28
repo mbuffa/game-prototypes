@@ -19,7 +19,7 @@ pub struct BasicAI {
 }
 
 impl AI for BasicAI {
-  fn update(&mut self, base: &Base, sensor: &mut Sensor, gun: &mut Gun, monsters: &mut std::slice::IterMut<'_, Monster>, dt: f32, asset_store: &AssetsStore) {
+  fn update(&mut self, _base: &Base, sensor: &mut Sensor, gun: &mut Gun, monsters: &mut std::slice::IterMut<'_, Monster>, dt: f32, asset_store: &AssetsStore) {
     match self.state {
       State::LookingForTarget => {
         if is_key_pressed(KeyCode::Escape) {
@@ -41,14 +41,14 @@ impl AI for BasicAI {
       },
       State::TargetAcquired => {
         gun.update(dt, asset_store);
-        // self.sensor.update(dt);
 
         let target_identifier = gun.get_target_identifier();
 
         // Refresh the gun's recorded target position, or release the target if it's not in reach.
-        match monsters.find(|monster| *monster.identifier() == target_identifier && monster.get_collider().y <= *base.y()) {
+        match monsters.find(|monster| *monster.identifier() == target_identifier) {
           Some(monster) => {
             gun.refresh_target_position(monster.get_collider().point().clone());
+            sensor.rotate_towards(&monster.get_collider().point(), dt);
           },
           None => self.stand_by(gun)
         }
