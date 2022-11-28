@@ -35,7 +35,7 @@ impl Sensor {
   pub fn draw(&self) {
     // println!("Sensor angle is: {}", self.angle);
     // draw_circle_lines(self.x, self.y, self.radius, 1f32, DARKGRAY);
-    draw_arc_lines(self.x, self.y, self.radius, self.angle - 30f32, 1f32, DARKGRAY);
+    draw_arc_lines(self.x, self.y, self.radius, self.angle - 30f32, 1f32, WHITE);
 
     let rangle = (self.angle + 30f32).to_radians();
     let langle = (self.angle - 30f32).to_radians();
@@ -46,7 +46,7 @@ impl Sensor {
       self.x + (self.radius * rangle.cos()),
       self.y + (self.radius * rangle.sin()),
       1f32,
-      RED
+      WHITE
     );
 
     draw_line(
@@ -55,7 +55,7 @@ impl Sensor {
       self.x + (self.radius * langle.cos()),
       self.y + (self.radius * langle.sin()),
       1f32,
-      RED
+      WHITE
     );
 
     // draw_triangle_lines(

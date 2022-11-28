@@ -15,7 +15,11 @@ async fn main() {
 
   loop {
     world.update(&store);
-    clear_background(BLACK);
+
+    clear_background(
+      Color::from_rgba(57, 98, 233, 255)
+    );
+    
     world.draw(&store);
     next_frame().await
   }

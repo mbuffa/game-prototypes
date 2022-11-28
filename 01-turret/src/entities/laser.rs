@@ -15,7 +15,7 @@ impl Laser {
   }
 
   pub fn draw(&self) {
-    draw_line(self.origin.x, self.origin.y, self.target.x, self.target.y, 2f32, YELLOW);
+    draw_line(self.origin.x, self.origin.y, self.target.x, self.target.y, 2f32, WHITE);
   }
 
   pub fn get_target_position(&self) -> &Vec2 { &self.target }

@@ -22,7 +22,7 @@ impl Missile {
       *texture,
       self.collider.x - (texture.width() / 2f32),
       self.collider.y - (texture.height() / 2f32),
-      YELLOW,
+      WHITE,
       DrawTextureParams { rotation: (self.angle - 90f32).to_radians(), dest_size: None, source: None, flip_x: false, flip_y: false, pivot: None }//Some(Vec2::new(self.pivot_x, self.pivot_y)) }
     );
 
