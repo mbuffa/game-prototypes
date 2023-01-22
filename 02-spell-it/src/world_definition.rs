@@ -38,7 +38,7 @@ impl WorldDefinition {
 
     pub fn initialize_spell_types(&mut self) {
         self.spell_types.insert(
-            "Wololo".to_owned(),
+            "wololo".to_owned(),
             Spell {
                 effect_type: SpellEffectType::Healing,
                 effect_base_power: 25,
@@ -46,7 +46,7 @@ impl WorldDefinition {
         );
 
         self.spell_types.insert(
-            "Awo you you".to_owned(),
+            "awo you you".to_owned(),
             Spell {
                 effect_type: SpellEffectType::Damage,
                 effect_base_power: 12,

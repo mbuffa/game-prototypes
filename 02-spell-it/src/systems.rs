@@ -1,30 +1,37 @@
 use crate::game_state::{GameState, GameStateUpdateResult, Player, Stage};
 use crate::world_definition::{Spell, SpellEffectType, WorldDefinition};
 
-// Draw functions
-
-pub fn draw_ui() {}
-
-pub fn draw_scene() {}
-
-// Update functions
-
-pub fn sanitize_input(input: &str) -> &str {
-    input.trim()
+pub fn sanitize_input(input: String) -> String {
+    input.trim().to_owned()
 }
 
-pub fn validate_input(definition: &WorldDefinition, input: &str) -> bool {
+pub fn validate_input(definition: &WorldDefinition, input: &String) -> bool {
+    crate::debug!("{:?}", definition.get_spell_types().keys());
+
     definition.get_spell_types().keys().any(|k| k == input)
 }
 
 pub fn execute_input(
     definition: &WorldDefinition,
     game_state: &mut GameState,
-    input: &str,
+    input: &String,
 ) -> GameStateUpdateResult {
-    let spell = definition.get_spell_types().get(input);
+    let spell = definition.get_spell_types().get(&input[..]);
 
     game_state.get_scene_mut().update_with(spell)
+}
+
+pub fn maybe_go_to_next_stage(game_state: &mut GameState) {
+    let scene = game_state.get_scene_mut();
+
+    match scene.get_current_stage() {
+        Some(stage) => {
+            if stage.are_all_dead() {
+                scene.go_to_next_stage();
+            }
+        }
+        None => {}
+    }
 }
 
 pub fn maybe_mark_game_as_over_or_won(game_state: &mut GameState) {
@@ -62,20 +69,28 @@ mod tests {
 
     #[test]
     fn sanitize_input_asserts() {
-        let input = "  Wo lo lo   \n";
-        let expected = "Wo lo lo";
+        let input = "  Wo lo lo   \n".to_owned();
+        let expected = "Wo lo lo".to_owned();
         assert_eq!(super::sanitize_input(input), expected);
     }
 
     #[test]
     fn validate_input_asserts() {
         let mut definitions = WorldDefinition::new();
-        // let mut game_state = GameState::new();
         definitions.initialize_spell_types();
 
-        assert_eq!(super::validate_input(&definitions, "Wololo"), true);
-        assert_eq!(super::validate_input(&definitions, "Awo you you"), true);
-        assert_eq!(super::validate_input(&definitions, "Avada Kedavra"), false);
+        assert_eq!(
+            super::validate_input(&definitions, &"wololo".to_owned()),
+            true
+        );
+        assert_eq!(
+            super::validate_input(&definitions, &"awo you you".to_owned()),
+            true
+        );
+        assert_eq!(
+            super::validate_input(&definitions, &"avada kedavra".to_owned()),
+            false
+        );
     }
 
     #[test]
@@ -86,14 +101,14 @@ mod tests {
         game_state.initialize();
 
         assert_eq!(
-            super::execute_input(&definitions, &mut game_state, "Wololo"),
+            super::execute_input(&definitions, &mut game_state, &"wololo".to_owned()),
             GameStateUpdateResult::NextTurn
         );
 
         assert_eq!(game_state.is_over(), false);
         assert_eq!(game_state.is_won(), false);
         assert_eq!(
-            super::execute_input(&definitions, &mut game_state, "Awo you you"),
+            super::execute_input(&definitions, &mut game_state, &"awo you you".to_owned()),
             GameStateUpdateResult::NextStage
         );
     }
@@ -106,7 +121,7 @@ mod tests {
         game_state.initialize();
 
         assert_eq!(
-            super::execute_input(&definitions, &mut game_state, "Awo you you"),
+            super::execute_input(&definitions, &mut game_state, &"awo you you".to_owned()),
             GameStateUpdateResult::NextStage
         );
 

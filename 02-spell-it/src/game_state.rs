@@ -5,13 +5,14 @@ type BaseDamage = u8;
 type PotentialMargin = f32;
 type Speed = u8;
 
-enum EnemyType {
+pub enum EnemyType {
     Goblin(BaseHealth, BaseDamage, PotentialMargin, Speed),
     Orc(BaseHealth, BaseDamage, PotentialMargin, Speed),
     Succubus(BaseHealth, BaseDamage, PotentialMargin, Speed),
 }
 
-struct Enemy {
+pub struct Enemy {
+    enemy_type: EnemyType,
     health: i16,
     damage: u8,
     speed: u8,
@@ -22,18 +23,21 @@ impl Enemy {
     pub fn new(enemy_type: EnemyType) -> Self {
         match enemy_type {
             EnemyType::Goblin(base_health, base_damage, potential, speed) => Self {
+                enemy_type: enemy_type,
                 health: (base_health as f32 * (1f32 + potential)) as i16,
                 damage: (base_damage as f32 * (1f32 + potential)) as u8,
                 speed: speed,
                 is_alive: true,
             },
             EnemyType::Orc(base_health, base_damage, potential, speed) => Self {
+                enemy_type: enemy_type,
                 health: (base_health as f32 * (1f32 + potential)) as i16,
                 damage: (base_damage as f32 * (1f32 + potential)) as u8,
                 speed: speed,
                 is_alive: true,
             },
             EnemyType::Succubus(base_health, base_damage, potential, speed) => Self {
+                enemy_type: enemy_type,
                 health: (base_health as f32 * (1f32 + potential)) as i16,
                 damage: (base_damage as f32 * (1f32 + potential)) as u8,
                 speed: speed,
@@ -44,6 +48,14 @@ impl Enemy {
 
     pub fn is_alive(&self) -> bool {
         self.is_alive
+    }
+
+    pub fn get_enemy_type(&self) -> &EnemyType {
+        &&self.enemy_type
+    }
+
+    pub fn get_health(&self) -> &i16 {
+        &self.health
     }
 }
 
@@ -72,16 +84,24 @@ impl Player {
     pub fn is_alive(&self) -> bool {
         self.is_alive
     }
+
+    pub fn get_health_max(&self) -> &i16 {
+        &self.health_max
+    }
+    pub fn get_health(&self) -> &i16 {
+        &self.health
+    }
 }
 
 pub struct Stage {
-    number: u16,
+    description: String,
+    number: u8,
     enemies: Vec<Enemy>,
 }
 
 impl Stage {
     pub fn inflict_damage(&mut self, amount: &u8) {
-        println!(
+        crate::debug!(
             "Inflicting damage {} on something {}",
             amount,
             self.enemies.len()
@@ -90,7 +110,7 @@ impl Stage {
         let mut inflicted = false;
 
         for e in self.enemies.iter_mut() {
-            println!("YOLO");
+            crate::debug!("YOLO");
 
             if e.is_alive() {
                 if inflicted == false {
@@ -99,7 +119,7 @@ impl Stage {
 
                     if e.health <= 0 {
                         e.is_alive = false;
-                        println!("BOOM");
+                        crate::debug!("BOOM");
                     }
                 }
             }
@@ -108,6 +128,18 @@ impl Stage {
 
     pub fn are_all_dead(&self) -> bool {
         self.enemies.iter().all(|e| e.is_alive == false)
+    }
+
+    pub fn get_description(&self) -> &String {
+        &self.description
+    }
+
+    pub fn get_number(&self) -> &u8 {
+        &self.number
+    }
+
+    pub fn get_enemies(&self) -> &Vec<Enemy> {
+        &self.enemies
     }
 }
 
@@ -144,10 +176,36 @@ impl Scene {
         self.stages.pop();
     }
 
+    pub fn has_more_stages(&self) -> bool {
+        self.stages.len() > 0
+    }
+
     pub fn initialize_stages(&mut self) {
         self.stages.push(Stage {
+            description: "A goblin. Shouldn't be too hard.".to_owned(),
             number: 0,
             enemies: vec![Enemy::new(EnemyType::Goblin(10, 10, 0f32, 10))],
+        });
+
+        self.stages.push(Stage {
+            description: "Four more then. And a tougher one too!".to_owned(),
+            number: 1,
+            enemies: vec![
+                Enemy::new(EnemyType::Goblin(100, 20, 0f32, 10)),
+                Enemy::new(EnemyType::Goblin(10, 10, 0f32, 10)),
+                Enemy::new(EnemyType::Goblin(10, 10, 0f32, 10)),
+                Enemy::new(EnemyType::Goblin(10, 10, 0f32, 10)),
+                Enemy::new(EnemyType::Goblin(10, 10, 0f32, 10)),
+            ],
+        });
+
+        self.stages.push(Stage {
+            description: "Orcs...!".to_owned(),
+            number: 2,
+            enemies: vec![
+                Enemy::new(EnemyType::Orc(40, 25, 0f32, 10)),
+                Enemy::new(EnemyType::Orc(40, 25, 0f32, 10)),
+            ],
         });
 
         self.stages.reverse();
@@ -169,10 +227,10 @@ impl Scene {
                         stage.inflict_damage(&spell_power);
 
                         if stage.are_all_dead() {
-                            println!("All Dead");
+                            crate::debug!("All Dead");
                             GameStateUpdateResult::NextStage
                         } else {
-                            println!("Not all dead");
+                            crate::debug!("Not all dead");
                             GameStateUpdateResult::NextTurn
                         }
                     }
@@ -193,10 +251,14 @@ impl Scene {
     }
 
     pub fn is_game_won(&self) -> bool {
+        if self.has_more_stages() {
+            return false;
+        }
+
         if let Some(stage) = self.get_current_stage() {
             stage.are_all_dead()
         } else {
-            false
+            true
         }
     }
 }
