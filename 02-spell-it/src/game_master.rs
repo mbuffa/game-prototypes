@@ -1,6 +1,7 @@
-use crate::game_state::{Enemy, GameState, Player};
+use crate::game_state::GameState;
 use crate::systems;
 use crate::utils;
+use crate::world::entity::{Entity, EntityType};
 use crate::world::World;
 
 use macroquad::prelude::*;

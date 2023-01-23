@@ -1,129 +1,14 @@
-use crate::utils;
+use crate::world::entity::{Entity, EntityType};
 use crate::world::spell::{Spell, SpellEffectType};
-
-type BaseHealth = u8;
-type BaseDamage = u8;
-type PotentialMargin = f32;
-type Speed = u8;
-
-pub enum EnemyType {
-    Goblin(BaseHealth, BaseDamage, PotentialMargin, Speed),
-    Orc(BaseHealth, BaseDamage, PotentialMargin, Speed),
-    Succubus(BaseHealth, BaseDamage, PotentialMargin, Speed),
-}
-
-pub struct Enemy {
-    identifier: String,
-    enemy_type: EnemyType,
-    health: i16,
-    damage: u8,
-    speed: u8,
-    is_alive: bool,
-}
-
-impl Enemy {
-    pub fn new(enemy_type: EnemyType) -> Self {
-        match enemy_type {
-            EnemyType::Goblin(base_health, base_damage, potential, speed) => Self {
-                identifier: utils::generate_identifier("gob"),
-                enemy_type: enemy_type,
-                health: (base_health as f32 * (1f32 + potential)) as i16,
-                damage: (base_damage as f32 * (1f32 + potential)) as u8,
-                speed: speed,
-                is_alive: true,
-            },
-            EnemyType::Orc(base_health, base_damage, potential, speed) => Self {
-                identifier: utils::generate_identifier("orc"),
-                enemy_type: enemy_type,
-                health: (base_health as f32 * (1f32 + potential)) as i16,
-                damage: (base_damage as f32 * (1f32 + potential)) as u8,
-                speed: speed,
-                is_alive: true,
-            },
-            EnemyType::Succubus(base_health, base_damage, potential, speed) => Self {
-                identifier: utils::generate_identifier("suc"),
-                enemy_type: enemy_type,
-                health: (base_health as f32 * (1f32 + potential)) as i16,
-                damage: (base_damage as f32 * (1f32 + potential)) as u8,
-                speed: speed,
-                is_alive: true,
-            },
-        }
-    }
-
-    pub fn is_alive(&self) -> bool {
-        self.is_alive
-    }
-
-    pub fn get_identifier(&self) -> &String {
-        &self.identifier
-    }
-    pub fn get_enemy_type(&self) -> &EnemyType {
-        &&self.enemy_type
-    }
-
-    pub fn get_health(&self) -> &i16 {
-        &self.health
-    }
-
-    pub fn get_speed(&self) -> &u8 {
-        &self.speed
-    }
-}
-
-pub struct Player {
-    identifier: String,
-    health_max: i16,
-    health: i16,
-    speed: u8,
-    is_alive: bool,
-}
-
-impl Player {
-    pub fn new() -> Self {
-        Self {
-            identifier: utils::generate_identifier("avt"),
-            health_max: 100,
-            health: 100,
-            speed: 10,
-            is_alive: true,
-        }
-    }
-
-    pub fn heal(&mut self, amount: u8) {
-        let final_amount = self.health_max - self.health + amount as i16;
-        self.health += final_amount;
-    }
-
-    pub fn is_alive(&self) -> bool {
-        self.is_alive
-    }
-
-    pub fn get_identifier(&self) -> &String {
-        &self.identifier
-    }
-
-    pub fn get_health_max(&self) -> &i16 {
-        &self.health_max
-    }
-
-    pub fn get_health(&self) -> &i16 {
-        &self.health
-    }
-
-    pub fn get_speed(&self) -> &u8 {
-        &self.speed
-    }
-}
 
 pub struct Stage {
     description: String,
     number: u8,
-    enemies: Vec<Enemy>,
+    enemies: Vec<Entity>,
 }
 
 impl Stage {
-    pub fn inflict_damage(&mut self, amount: &u8) {
+    pub fn inflict_damage(&mut self, amount: i16) {
         crate::debug!(
             "Inflicting damage {} on something {}",
             amount,
@@ -135,22 +20,15 @@ impl Stage {
         for e in self.enemies.iter_mut() {
             crate::debug!("YOLO");
 
-            if e.is_alive() {
-                if inflicted == false {
-                    e.health -= *amount as i16;
-                    inflicted = true;
-
-                    if e.health <= 0 {
-                        e.is_alive = false;
-                        crate::debug!("BOOM");
-                    }
-                }
+            if e.is_alive() && inflicted == false {
+                e.damage(amount);
+                inflicted = true;
             }
         }
     }
 
     pub fn are_all_dead(&self) -> bool {
-        self.enemies.iter().all(|e| e.is_alive == false)
+        self.enemies.iter().all(|e| e.is_alive() == false)
     }
 
     pub fn get_description(&self) -> &String {
@@ -161,7 +39,7 @@ impl Stage {
         &self.number
     }
 
-    pub fn get_enemies(&self) -> &Vec<Enemy> {
+    pub fn get_enemies(&self) -> &Vec<Entity> {
         &self.enemies
     }
 }
@@ -177,14 +55,14 @@ pub enum GameStateUpdateResult {
 
 pub struct Scene {
     stages: Vec<Stage>,
-    player: Player,
+    player: Entity,
 }
 
 impl Scene {
-    pub fn get_player(&self) -> &Player {
+    pub fn get_player(&self) -> &Entity {
         &self.player
     }
-    pub fn get_player_mut(&mut self) -> &mut Player {
+    pub fn get_player_mut(&mut self) -> &mut Entity {
         &mut self.player
     }
 
@@ -208,18 +86,18 @@ impl Scene {
         self.stages.push(Stage {
             description: "A goblin. Shouldn't be too hard.".to_owned(),
             number: 0,
-            enemies: vec![Enemy::new(EnemyType::Goblin(10, 10, 0f32, 10))],
+            enemies: vec![Entity::new(EntityType::Goblin(10, 10, 0f32, 10))],
         });
 
         self.stages.push(Stage {
             description: "Four more then. And a tougher one too!".to_owned(),
             number: 1,
             enemies: vec![
-                Enemy::new(EnemyType::Goblin(100, 20, 0f32, 10)),
-                Enemy::new(EnemyType::Goblin(10, 10, 0f32, 10)),
-                Enemy::new(EnemyType::Goblin(10, 10, 0f32, 10)),
-                Enemy::new(EnemyType::Goblin(10, 10, 0f32, 10)),
-                Enemy::new(EnemyType::Goblin(10, 10, 0f32, 10)),
+                Entity::new(EntityType::Goblin(100, 20, 0f32, 10)),
+                Entity::new(EntityType::Goblin(10, 10, 0f32, 10)),
+                Entity::new(EntityType::Goblin(10, 10, 0f32, 10)),
+                Entity::new(EntityType::Goblin(10, 10, 0f32, 10)),
+                Entity::new(EntityType::Goblin(10, 10, 0f32, 10)),
             ],
         });
 
@@ -227,8 +105,8 @@ impl Scene {
             description: "Orcs...!".to_owned(),
             number: 2,
             enemies: vec![
-                Enemy::new(EnemyType::Orc(40, 25, 0f32, 10)),
-                Enemy::new(EnemyType::Orc(40, 25, 0f32, 10)),
+                Entity::new(EntityType::Orc(40, 25, 0f32, 10)),
+                Entity::new(EntityType::Orc(40, 25, 0f32, 10)),
             ],
         });
 
@@ -246,9 +124,9 @@ impl Scene {
                 }
                 Some(spell) => match spell.get_type().clone() {
                     SpellEffectType::Damage => {
-                        let spell_power = spell.get_base_power();
+                        let spell_power = spell.get_base_power() as i16;
 
-                        stage.inflict_damage(&spell_power);
+                        stage.inflict_damage(spell_power);
 
                         if stage.are_all_dead() {
                             crate::debug!("All Dead");
@@ -259,7 +137,7 @@ impl Scene {
                         }
                     }
                     SpellEffectType::Healing => {
-                        let spell_power = spell.get_base_power();
+                        let spell_power = spell.get_base_power() as i16;
 
                         self.player.heal(spell_power);
 
@@ -297,13 +175,7 @@ impl GameState {
     pub fn new() -> Self {
         Self {
             scene: Scene {
-                player: Player {
-                    identifier: utils::generate_identifier("avt"),
-                    health_max: 100,
-                    health: 100,
-                    speed: 10,
-                    is_alive: true,
-                },
+                player: Entity::new(EntityType::Avatar(100, 70)),
                 stages: Vec::new(),
             },
             is_over: false,

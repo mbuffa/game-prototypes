@@ -23,6 +23,7 @@ const MONSTER_WIDTH: f32 = 40f32;
 const MONSTER_HEIGHT: f32 = 100f32;
 
 use crate::game_state::GameState;
+use crate::world::entity::EntityType;
 use crate::world::World;
 
 // fn center_x() -> f32 { screen_width() /2f32 }
@@ -205,32 +206,40 @@ pub fn draw_scene(world: &World, game_state: &GameState, input: &String) {
             let party_width = (party_size as f32 * MONSTER_WIDTH)
                 + ((party_size as f32 - 1f32) * grid_48_width());
 
-            enemies.iter().enumerate().for_each(|(i, e)| {
-                if e.is_alive() {
-                    let x = scene_center.0 - (party_width / 2f32)
-                        + ((i as f32) * (MONSTER_WIDTH + grid_48_width()));
+            enemies
+                .iter()
+                .enumerate()
+                .filter(|(_i, e)| match e.get_entity_type() {
+                    EntityType::Avatar(_, _) => false,
+                    _ => true,
+                })
+                .for_each(|(i, e)| {
+                    if e.is_alive() {
+                        let x = scene_center.0 - (party_width / 2f32)
+                            + ((i as f32) * (MONSTER_WIDTH + grid_48_width()));
 
-                    draw_rectangle(
-                        x,
-                        enemy_pos.1,
-                        MONSTER_WIDTH,
-                        MONSTER_HEIGHT,
-                        match e.get_enemy_type() {
-                            crate::game_state::EnemyType::Goblin(_, _, _, _) => PINK,
-                            crate::game_state::EnemyType::Orc(_, _, _, _) => GREEN,
-                            crate::game_state::EnemyType::Succubus(_, _, _, _) => RED,
-                        },
-                    );
+                        draw_rectangle(
+                            x,
+                            enemy_pos.1,
+                            MONSTER_WIDTH,
+                            MONSTER_HEIGHT,
+                            match e.get_entity_type() {
+                                EntityType::Goblin(_, _, _, _) => PINK,
+                                EntityType::Orc(_, _, _, _) => GREEN,
+                                EntityType::Succubus(_, _, _, _) => RED,
+                                EntityType::Avatar(_, _) => MAGENTA,
+                            },
+                        );
 
-                    draw_text(
-                        &format!("{}", e.get_health()),
-                        x + grid_48_width() / 2f32,
-                        enemy_pos.1 - grid_48_height() / 2f32,
-                        24.0,
-                        WHITE,
-                    );
-                }
-            })
+                        draw_text(
+                            &format!("{}", e.get_health()),
+                            x + grid_48_width() / 2f32,
+                            enemy_pos.1 - grid_48_height() / 2f32,
+                            24.0,
+                            WHITE,
+                        );
+                    }
+                })
         }
         None => {}
     }
