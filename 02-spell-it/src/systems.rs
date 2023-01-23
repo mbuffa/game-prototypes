@@ -1,7 +1,7 @@
 use crate::game_state::{GameState, GameStateUpdateResult, Player, Stage};
 use crate::world_definition::{Spell, SpellEffectType, WorldDefinition};
 
-pub fn sanitize_input(input: String) -> String {
+pub fn sanitize_input(input: &String) -> String {
     input.trim().to_owned()
 }
 
@@ -71,7 +71,7 @@ mod tests {
     fn sanitize_input_asserts() {
         let input = "  Wo lo lo   \n".to_owned();
         let expected = "Wo lo lo".to_owned();
-        assert_eq!(super::sanitize_input(input), expected);
+        assert_eq!(super::sanitize_input(&input), expected);
     }
 
     #[test]
