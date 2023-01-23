@@ -127,6 +127,9 @@ mod tests {
 
         super::maybe_mark_game_as_over_or_won(&mut game_state);
 
+        // FIXME: This is failing because I added stages.
+        // To fix this, we should be able to specify stages at startup, or load
+        // a file containing stages.
         assert_eq!(game_state.is_over(), true);
         assert_eq!(game_state.is_won(), true);
     }
