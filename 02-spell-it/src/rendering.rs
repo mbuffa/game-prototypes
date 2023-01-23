@@ -23,7 +23,7 @@ const MONSTER_WIDTH: f32 = 40f32;
 const MONSTER_HEIGHT: f32 = 100f32;
 
 use crate::game_state::GameState;
-use crate::world_definition::WorldDefinition;
+use crate::world::World;
 
 // fn center_x() -> f32 { screen_width() /2f32 }
 // fn center_y() -> f32 { screen_height() /2f32 }
@@ -72,14 +72,14 @@ pub fn draw_ui_debug(game_state: &GameState) {
     );
 }
 
-pub fn draw_ui(definition: &WorldDefinition, game_state: &GameState, input: &String) {
-    draw_spellbook(&definition);
+pub fn draw_ui(world: &World, game_state: &GameState, input: &String) {
+    draw_spellbook(&world);
     draw_health(&game_state);
     draw_description(&game_state);
     draw_input(&input);
 }
 
-fn draw_spellbook(definition: &WorldDefinition) {
+fn draw_spellbook(world: &World) {
     let pos = (grid_24_width(), grid_24_height());
 
     // Background
@@ -92,14 +92,14 @@ fn draw_spellbook(definition: &WorldDefinition) {
     );
 
     // Spells
-    definition
+    world
         .get_spell_types()
         .iter()
         .enumerate()
         .for_each(|(i, (k, v))| {
             let color = match v.get_type() {
-                crate::world_definition::SpellEffectType::Damage => COLOR_SPELL_DAMAGE,
-                crate::world_definition::SpellEffectType::Healing => COLOR_SPELL_HEALING,
+                crate::world::spell::SpellEffectType::Damage => COLOR_SPELL_DAMAGE,
+                crate::world::spell::SpellEffectType::Healing => COLOR_SPELL_HEALING,
             };
 
             utils::draw_text_with_shadow(
@@ -179,7 +179,7 @@ fn draw_input(input: &String) {
     );
 }
 
-pub fn draw_scene(definition: &WorldDefinition, game_state: &GameState, input: &String) {
+pub fn draw_scene(world: &World, game_state: &GameState, input: &String) {
     let scene_pos = (grid_12_width() * 4f32, grid_24_height() * 1f32);
     let scene_width = grid_12_width() * 7f32;
     let scene_height = grid_12_height() * 6f32;

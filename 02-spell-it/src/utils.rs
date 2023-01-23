@@ -3,6 +3,17 @@ use macroquad::input::{is_key_pressed, KeyCode};
 use macroquad::color::Color;
 use macroquad::text::draw_text;
 
+pub fn generate_identifier(prefix: &str) -> String {
+    [
+        prefix.to_owned(),
+        macroquad::rand::rand().to_string(),
+        macroquad::rand::rand().to_string(),
+        macroquad::rand::rand().to_string(),
+        macroquad::rand::rand().to_string(),
+    ]
+    .join("-")
+}
+
 pub fn draw_text_with_shadow(
     text: &str,
     x: f32,

@@ -1,15 +1,15 @@
 use game_master::GameMaster;
 use macroquad::prelude::*;
 
-mod game_state;
 mod game_master;
+mod game_state;
 mod rendering;
 mod systems;
 mod utils;
-mod world_definition;
+mod world;
 
 use game_state::GameState;
-use world_definition::WorldDefinition;
+use world::World;
 
 #[macroquad::main("Spell It")]
 async fn main() {
@@ -21,20 +21,19 @@ async fn main() {
     loop {
         since_last_frame = macroquad::time::get_frame_time();
 
-        let (definition, game_state, input) =
-            game_master.update(&since_last_frame);
+        let (world, game_state, input) = game_master.update(&since_last_frame);
 
         // clear_background(Color::from_rgba(57, 98, 233, 255));
         clear_background(BROWN);
 
-        draw(&definition, &game_state, &input);
+        draw(&world, &game_state, &input);
 
         next_frame().await
     }
 }
 
-fn draw(definition: &WorldDefinition, game_state: &GameState, input: &String) {
-    rendering::draw_scene(&definition, &game_state, &input);
-    rendering::draw_ui(&definition, &game_state, &input);
+fn draw(world: &World, game_state: &GameState, input: &String) {
+    rendering::draw_scene(&world, &game_state, &input);
+    rendering::draw_ui(&world, &game_state, &input);
     // rendering::draw_ui_debug(&game_state);
 }

@@ -1,31 +1,15 @@
+pub mod entity;
+pub mod spell;
+
 use std::collections::HashMap;
 
-#[derive(Clone)]
-pub enum SpellEffectType {
-    Damage,
-    Healing,
-}
+use spell::{Spell, SpellEffectType};
 
-#[derive(Clone)]
-pub struct Spell {
-    effect_type: SpellEffectType,
-    effect_base_power: u8,
-}
-
-impl Spell {
-    pub fn get_type(&self) -> &SpellEffectType {
-        &self.effect_type
-    }
-    pub fn get_base_power(&self) -> u8 {
-        self.effect_base_power
-    }
-}
-
-pub struct WorldDefinition {
+pub struct World {
     spell_types: HashMap<String, Spell>,
 }
 
-impl WorldDefinition {
+impl World {
     pub fn new() -> Self {
         Self {
             spell_types: HashMap::new(),

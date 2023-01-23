@@ -1,22 +1,23 @@
 use crate::game_state::{GameState, GameStateUpdateResult, Player, Stage};
-use crate::world_definition::{Spell, SpellEffectType, WorldDefinition};
+use crate::world::spell::{Spell, SpellEffectType};
+use crate::world::World;
 
 pub fn sanitize_input(input: &String) -> String {
     input.trim().to_owned()
 }
 
-pub fn validate_input(definition: &WorldDefinition, input: &String) -> bool {
-    crate::debug!("{:?}", definition.get_spell_types().keys());
+pub fn validate_input(world: &World, input: &String) -> bool {
+    crate::debug!("{:?}", world.get_spell_types().keys());
 
-    definition.get_spell_types().keys().any(|k| k == input)
+    world.get_spell_types().keys().any(|k| k == input)
 }
 
 pub fn execute_input(
-    definition: &WorldDefinition,
+    world: &World,
     game_state: &mut GameState,
     input: &String,
 ) -> GameStateUpdateResult {
-    let spell = definition.get_spell_types().get(&input[..]);
+    let spell = world.get_spell_types().get(&input[..]);
 
     game_state.get_scene_mut().update_with(spell)
 }
@@ -49,14 +50,14 @@ pub fn maybe_mark_game_as_over_or_won(game_state: &mut GameState) {
 mod tests {
     use crate::{
         game_state::{GameState, GameStateUpdateResult},
-        world_definition::WorldDefinition,
+        world::World,
     };
 
     #[test]
     fn init_asserts() {
-        let mut definitions = WorldDefinition::new();
+        let mut world = World::new();
         let mut game_state = GameState::new();
-        definitions.initialize_spell_types();
+        world.initialize_spell_types();
         game_state.initialize();
 
         match game_state.get_scene().get_current_stage() {
@@ -76,52 +77,49 @@ mod tests {
 
     #[test]
     fn validate_input_asserts() {
-        let mut definitions = WorldDefinition::new();
-        definitions.initialize_spell_types();
+        let mut world = World::new();
+        world.initialize_spell_types();
 
+        assert_eq!(super::validate_input(&world, &"wololo".to_owned()), true);
         assert_eq!(
-            super::validate_input(&definitions, &"wololo".to_owned()),
+            super::validate_input(&world, &"awo you you".to_owned()),
             true
         );
         assert_eq!(
-            super::validate_input(&definitions, &"awo you you".to_owned()),
-            true
-        );
-        assert_eq!(
-            super::validate_input(&definitions, &"avada kedavra".to_owned()),
+            super::validate_input(&world, &"avada kedavra".to_owned()),
             false
         );
     }
 
     #[test]
     fn execute_input_asserts() {
-        let mut definitions = WorldDefinition::new();
+        let mut world = World::new();
         let mut game_state = GameState::new();
-        definitions.initialize_spell_types();
+        world.initialize_spell_types();
         game_state.initialize();
 
         assert_eq!(
-            super::execute_input(&definitions, &mut game_state, &"wololo".to_owned()),
+            super::execute_input(&world, &mut game_state, &"wololo".to_owned()),
             GameStateUpdateResult::NextTurn
         );
 
         assert_eq!(game_state.is_over(), false);
         assert_eq!(game_state.is_won(), false);
         assert_eq!(
-            super::execute_input(&definitions, &mut game_state, &"awo you you".to_owned()),
+            super::execute_input(&world, &mut game_state, &"awo you you".to_owned()),
             GameStateUpdateResult::NextStage
         );
     }
 
     #[test]
     fn is_game_over_asserts() {
-        let mut definitions = WorldDefinition::new();
+        let mut world = World::new();
         let mut game_state = GameState::new();
-        definitions.initialize_spell_types();
+        world.initialize_spell_types();
         game_state.initialize();
 
         assert_eq!(
-            super::execute_input(&definitions, &mut game_state, &"awo you you".to_owned()),
+            super::execute_input(&world, &mut game_state, &"awo you you".to_owned()),
             GameStateUpdateResult::NextStage
         );
 

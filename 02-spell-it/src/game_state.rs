@@ -1,4 +1,5 @@
-use crate::world_definition::{Spell, SpellEffectType};
+use crate::utils;
+use crate::world::spell::{Spell, SpellEffectType};
 
 type BaseHealth = u8;
 type BaseDamage = u8;
@@ -12,6 +13,7 @@ pub enum EnemyType {
 }
 
 pub struct Enemy {
+    identifier: String,
     enemy_type: EnemyType,
     health: i16,
     damage: u8,
@@ -23,6 +25,7 @@ impl Enemy {
     pub fn new(enemy_type: EnemyType) -> Self {
         match enemy_type {
             EnemyType::Goblin(base_health, base_damage, potential, speed) => Self {
+                identifier: utils::generate_identifier("gob"),
                 enemy_type: enemy_type,
                 health: (base_health as f32 * (1f32 + potential)) as i16,
                 damage: (base_damage as f32 * (1f32 + potential)) as u8,
@@ -30,6 +33,7 @@ impl Enemy {
                 is_alive: true,
             },
             EnemyType::Orc(base_health, base_damage, potential, speed) => Self {
+                identifier: utils::generate_identifier("orc"),
                 enemy_type: enemy_type,
                 health: (base_health as f32 * (1f32 + potential)) as i16,
                 damage: (base_damage as f32 * (1f32 + potential)) as u8,
@@ -37,6 +41,7 @@ impl Enemy {
                 is_alive: true,
             },
             EnemyType::Succubus(base_health, base_damage, potential, speed) => Self {
+                identifier: utils::generate_identifier("suc"),
                 enemy_type: enemy_type,
                 health: (base_health as f32 * (1f32 + potential)) as i16,
                 damage: (base_damage as f32 * (1f32 + potential)) as u8,
@@ -50,6 +55,9 @@ impl Enemy {
         self.is_alive
     }
 
+    pub fn get_identifier(&self) -> &String {
+        &self.identifier
+    }
     pub fn get_enemy_type(&self) -> &EnemyType {
         &&self.enemy_type
     }
@@ -57,9 +65,14 @@ impl Enemy {
     pub fn get_health(&self) -> &i16 {
         &self.health
     }
+
+    pub fn get_speed(&self) -> &u8 {
+        &self.speed
+    }
 }
 
 pub struct Player {
+    identifier: String,
     health_max: i16,
     health: i16,
     speed: u8,
@@ -69,6 +82,7 @@ pub struct Player {
 impl Player {
     pub fn new() -> Self {
         Self {
+            identifier: utils::generate_identifier("avt"),
             health_max: 100,
             health: 100,
             speed: 10,
@@ -85,11 +99,20 @@ impl Player {
         self.is_alive
     }
 
+    pub fn get_identifier(&self) -> &String {
+        &self.identifier
+    }
+
     pub fn get_health_max(&self) -> &i16 {
         &self.health_max
     }
+
     pub fn get_health(&self) -> &i16 {
         &self.health
+    }
+
+    pub fn get_speed(&self) -> &u8 {
+        &self.speed
     }
 }
 
@@ -168,6 +191,7 @@ impl Scene {
     pub fn get_current_stage(&self) -> Option<&Stage> {
         self.stages.last()
     }
+
     pub fn get_current_stage_mut(&mut self) -> Option<&mut Stage> {
         self.stages.last_mut()
     }
@@ -264,7 +288,6 @@ impl Scene {
 }
 
 pub struct GameState {
-    current_turn: u16,
     scene: Scene,
     is_over: bool,
     is_won: bool,
@@ -273,9 +296,9 @@ pub struct GameState {
 impl GameState {
     pub fn new() -> Self {
         Self {
-            current_turn: 0,
             scene: Scene {
                 player: Player {
+                    identifier: utils::generate_identifier("avt"),
                     health_max: 100,
                     health: 100,
                     speed: 10,
@@ -295,6 +318,7 @@ impl GameState {
     pub fn is_over(&self) -> bool {
         self.is_over
     }
+
     pub fn is_won(&self) -> bool {
         self.is_won
     }
@@ -302,6 +326,7 @@ impl GameState {
     pub fn set_is_over(&mut self, over: bool) {
         self.is_over = over;
     }
+
     pub fn set_is_won(&mut self, won: bool) {
         self.is_won = won;
     }
@@ -309,6 +334,7 @@ impl GameState {
     pub fn get_scene(&self) -> &Scene {
         &self.scene
     }
+
     pub fn get_scene_mut(&mut self) -> &mut Scene {
         &mut self.scene
     }
