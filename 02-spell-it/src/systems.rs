@@ -22,16 +22,20 @@ pub fn execute_input(
     game_state.get_scene_mut().update_with(spell)
 }
 
-pub fn maybe_go_to_next_stage(game_state: &mut GameState) {
+pub fn maybe_go_to_next_stage(game_state: &mut GameState) -> bool {
     let scene = game_state.get_scene_mut();
 
     match scene.get_current_stage() {
         Some(stage) => {
             if stage.are_all_dead() {
                 scene.go_to_next_stage();
+                return true;
             }
+            return false;
         }
-        None => {}
+        None => {
+            return false;
+        }
     }
 }
 
