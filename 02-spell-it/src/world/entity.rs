@@ -107,6 +107,8 @@ impl Entity {
     }
 
     pub fn inflict_damage(&mut self, amount: i16) {
+        crate::debug!("Inflicting {} to {}", amount, self.identifier);
+
         self.health -= amount;
 
         if self.health <= 0 {

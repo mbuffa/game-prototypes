@@ -11,6 +11,8 @@ const COLOR_TEXT_SHADOW: Color = DARKGRAY;
 
 const COLOR_PLAYER_HEALTH_BACKGROUND: Color = BLACK;
 const COLOR_PLAYER_HEALTH_FOREGROUND: Color = RED;
+const COLOR_PLAYER_SPEED_BACKGROUND: Color = BLACK;
+const COLOR_PLAYER_SPEED_FOREGROUND: Color = GREEN;
 
 const DESCRIPTION_FONT_SIZE: f32 = 24f32;
 const COLOR_DESCRIPTION_FOREGROUND: Color = WHITE;
@@ -55,13 +57,13 @@ fn grid_48_height() -> f32 {
 pub fn draw_victory_screen() {
     clear_background(BLACK);
 
-    utils::draw_centered_text("VICTORY!", center_x(), center_y(), YELLOW, 128, 1.0, 0.0);
+    utils::draw_centered_text("VICTORY!", center_x(), center_y(), 128, YELLOW, 1.0, 0.0);
 }
 
 pub fn draw_defeat_screen() {
     clear_background(BLACK);
 
-    utils::draw_centered_text("YOU DIED", center_x(), center_y(), YELLOW, 128, 1.0, 0.0);
+    utils::draw_centered_text("YOU DIED", center_x(), center_y(), 128, YELLOW, 1.0, 0.0);
 }
 
 pub fn draw_game_screen(world: &World, game_state: &GameState, input: &String) {
@@ -99,6 +101,7 @@ pub fn draw_ui_debug(game_state: &GameState) {
 pub fn draw_ui(world: &World, game_state: &GameState, input: &String) {
     draw_spellbook(&world);
     draw_health(&game_state);
+    draw_speed(&game_state);
     draw_description(&game_state);
     draw_input(&input);
 }
@@ -149,14 +152,56 @@ fn draw_health(game_state: &GameState) {
         COLOR_PLAYER_HEALTH_BACKGROUND,
     );
 
-    // crate::debug!("{}", remaining_health);
+    utils::draw_centered_text(
+        "Health",
+        grid_24_width() + grid_48_width(),
+        grid_12_height() * 4f32 - grid_48_height(),
+        24,
+        WHITE,
+        1.0,
+        0.0,
+    );
 
-    draw_text(
+    utils::draw_centered_text(
         &remaining_health,
-        grid_24_width(),
+        grid_24_width() + grid_48_width(),
         grid_12_height() * 5f32,
-        24.0,
-        GREEN,
+        24,
+        COLOR_PLAYER_HEALTH_FOREGROUND,
+        1.0,
+        0.0,
+    );
+}
+
+fn draw_speed(game_state: &GameState) {
+    let speed = format!("{}", game_state.get_scene().get_player().get_speed());
+
+    draw_rectangle(
+        grid_24_width() * 4f32,
+        grid_12_height() * 4f32,
+        grid_24_width(),
+        grid_12_height() * 3f32 - grid_24_height(),
+        COLOR_PLAYER_SPEED_BACKGROUND,
+    );
+
+    utils::draw_centered_text(
+        "Speed",
+        (grid_24_width() + grid_48_width()) * 3f32,
+        grid_12_height() * 4f32 - grid_48_height(),
+        24,
+        WHITE,
+        1.0,
+        0.0,
+    );
+
+    utils::draw_centered_text(
+        &speed,
+        (grid_24_width() + grid_48_width()) * 3f32,
+        grid_12_height() * 5f32,
+        24,
+        COLOR_PLAYER_SPEED_FOREGROUND,
+        1.0,
+        0.0,
     );
 }
 

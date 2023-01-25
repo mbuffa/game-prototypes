@@ -18,8 +18,8 @@ pub fn draw_centered_text(
     text: &str,
     x: f32,
     y: f32,
-    color: Color,
     font_size: u16,
+    color: Color,
     font_scale: f32,
     rotation: f32,
 ) {

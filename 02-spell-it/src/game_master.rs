@@ -240,7 +240,7 @@ impl GameMaster {
                                     match stage
                                         .get_enemies()
                                         .iter()
-                                        .find(|e| e.get_identifier() == identifier)
+                                        .find(|e| e.is_alive() && e.get_identifier() == identifier)
                                     {
                                         None => panic!("Sound of the police"),
                                         Some(e) => {
