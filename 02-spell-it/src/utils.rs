@@ -14,6 +14,20 @@ pub fn generate_identifier(prefix: &str) -> String {
     .join("-")
 }
 
+pub fn draw_centered_text(
+    text: &str,
+    x: f32,
+    y: f32,
+    color: Color,
+    font_size: u16,
+    font_scale: f32,
+    rotation: f32,
+) {
+    let center = macroquad::text::get_text_center(text, None, font_size, font_scale, rotation);
+
+    draw_text(text, x - center.x, y - center.y, font_size as f32, color);
+}
+
 pub fn draw_text_with_shadow(
     text: &str,
     x: f32,

@@ -91,6 +91,7 @@ pub struct GameMaster {
     player_input: String,
     player_identifier: Option<String>,
     state: State,
+    // FIXME: Move those two to GameState to expose them to draw functions.
     current_turn: u16,
     sequence: Option<Sequence>,
 }
@@ -149,16 +150,18 @@ impl GameMaster {
 
         if self.game_state.is_won() {
             crate::debug!("You won!");
+        } else if self.game_state.is_over() {
+            crate::debug!("You lost!");
+        } else {
+            self.update_combat_state();
+            self.update_combat_system();
         }
-
-        self.update_combat_state();
-        self.update_combat_system();
 
         (&self.world, &self.game_state, &self.player_input)
     }
 
     fn update_combat_state(&mut self) {
-        crate::debug!("Entering update_combat_state");
+        // crate::debug!("Entering update_combat_state");
         let player_identifier = self.player_identifier.as_ref().expect("Yolo");
 
         match &mut self.sequence {
@@ -192,7 +195,7 @@ impl GameMaster {
     }
 
     fn update_combat_system(&mut self) {
-        crate::debug!("Entering update_combat_system");
+        // crate::debug!("Entering update_combat_system");
 
         match &mut self.sequence {
             Some(sequence) => {
@@ -227,8 +230,29 @@ impl GameMaster {
                         }
                     }
                     CombatState::EnemyTurn => {
-                        // FIXME: Implement AI.
-                        crate::debug!("FIXME: Enemy passes his turn.");
+                        // crate::debug!("FIXME: Enemy passes his turn.");
+
+                        match self.game_state.get_scene().get_current_stage() {
+                            None => panic!("Woops"),
+                            Some(stage) => match sequence.get_order().get(sequence.current()) {
+                                None => panic!("Woop Woop"),
+                                Some((identifier, _speed)) => {
+                                    match stage
+                                        .get_enemies()
+                                        .iter()
+                                        .find(|e| e.get_identifier() == identifier)
+                                    {
+                                        None => panic!("Sound of the police"),
+                                        Some(e) => {
+                                            let amount = *e.damage() as i16;
+                                            let player =
+                                                self.game_state.get_scene_mut().get_player_mut();
+                                            player.inflict_damage(amount);
+                                        }
+                                    }
+                                }
+                            },
+                        }
                         sequence.next();
                     }
                 }

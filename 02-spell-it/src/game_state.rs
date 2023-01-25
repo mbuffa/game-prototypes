@@ -21,7 +21,7 @@ impl Stage {
             crate::debug!("YOLO");
 
             if e.is_alive() && inflicted == false {
-                e.damage(amount);
+                e.inflict_damage(amount);
                 inflicted = true;
             }
         }

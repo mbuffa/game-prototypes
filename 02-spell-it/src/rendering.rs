@@ -26,8 +26,12 @@ use crate::game_state::GameState;
 use crate::world::entity::EntityType;
 use crate::world::World;
 
-// fn center_x() -> f32 { screen_width() /2f32 }
-// fn center_y() -> f32 { screen_height() /2f32 }
+fn center_x() -> f32 {
+    screen_width() / 2f32
+}
+fn center_y() -> f32 {
+    screen_height() / 2f32
+}
 
 fn grid_12_width() -> f32 {
     screen_width() / 12f32
@@ -46,6 +50,25 @@ fn grid_48_width() -> f32 {
 }
 fn grid_48_height() -> f32 {
     screen_height() / 48f32
+}
+
+pub fn draw_victory_screen() {
+    clear_background(BLACK);
+
+    utils::draw_centered_text("VICTORY!", center_x(), center_y(), YELLOW, 128, 1.0, 0.0);
+}
+
+pub fn draw_defeat_screen() {
+    clear_background(BLACK);
+
+    utils::draw_centered_text("YOU DIED", center_x(), center_y(), YELLOW, 128, 1.0, 0.0);
+}
+
+pub fn draw_game_screen(world: &World, game_state: &GameState, input: &String) {
+    clear_background(BROWN);
+
+    draw_scene(&world, &game_state, &input);
+    draw_ui(&world, &game_state, &input);
 }
 
 pub fn draw_ui_debug(game_state: &GameState) {

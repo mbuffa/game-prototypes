@@ -106,12 +106,16 @@ impl Entity {
         self.health += final_amount;
     }
 
-    pub fn damage(&mut self, amount: i16) {
+    pub fn inflict_damage(&mut self, amount: i16) {
         self.health -= amount;
 
         if self.health <= 0 {
             self.is_alive = false;
             crate::debug!("BOOM");
         }
+    }
+
+    pub fn damage(&self) -> &u8 {
+        &self.damage
     }
 }

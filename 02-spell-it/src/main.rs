@@ -23,9 +23,6 @@ async fn main() {
 
         let (world, game_state, input) = game_master.update(&since_last_frame);
 
-        // clear_background(Color::from_rgba(57, 98, 233, 255));
-        clear_background(BROWN);
-
         draw(&world, &game_state, &input);
 
         next_frame().await
@@ -33,7 +30,13 @@ async fn main() {
 }
 
 fn draw(world: &World, game_state: &GameState, input: &String) {
-    rendering::draw_scene(&world, &game_state, &input);
-    rendering::draw_ui(&world, &game_state, &input);
+    if game_state.is_won() {
+        rendering::draw_victory_screen();
+    } else if game_state.is_over() {
+        rendering::draw_defeat_screen();
+    } else {
+        rendering::draw_game_screen(&world, &game_state, &input);
+    }
+
     // rendering::draw_ui_debug(&game_state);
 }
