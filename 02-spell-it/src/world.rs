@@ -22,7 +22,7 @@ impl World {
 
     pub fn initialize_spell_types(&mut self) {
         self.spell_types.insert(
-            "wololo".to_owned(),
+            "heal".to_owned(),
             Spell {
                 effect_type: SpellEffectType::Healing,
                 effect_base_power: 25,
@@ -30,10 +30,26 @@ impl World {
         );
 
         self.spell_types.insert(
-            "awo you you".to_owned(),
+            "damage".to_owned(),
             Spell {
                 effect_type: SpellEffectType::Damage,
                 effect_base_power: 12,
+            },
+        );
+
+        self.spell_types.insert(
+            "shield".to_owned(),
+            Spell {
+                effect_type: SpellEffectType::Shield,
+                effect_base_power: 33,
+            },
+        );
+
+        self.spell_types.insert(
+            "multi".to_owned(),
+            Spell {
+                effect_type: SpellEffectType::MultiDamage,
+                effect_base_power: 4,
             },
         );
     }

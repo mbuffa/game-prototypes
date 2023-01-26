@@ -7,10 +7,14 @@ const SPELL_FONT_SIZE: f32 = 24.0;
 const SPELL_X_PADDING: f32 = 10f32;
 const COLOR_SPELL_DAMAGE: Color = RED;
 const COLOR_SPELL_HEALING: Color = BLUE;
+const COLOR_SPELL_SHIELD: Color = SKYBLUE;
+const COLOR_SPELL_MULTIDAMAGE: Color = RED;
 const COLOR_TEXT_SHADOW: Color = DARKGRAY;
 
 const COLOR_PLAYER_HEALTH_BACKGROUND: Color = BLACK;
 const COLOR_PLAYER_HEALTH_FOREGROUND: Color = RED;
+const COLOR_PLAYER_SHIELD_BACKGROUND: Color = BLACK;
+const COLOR_PLAYER_SHIELD_FOREGROUND: Color = SKYBLUE;
 const COLOR_PLAYER_SPEED_BACKGROUND: Color = BLACK;
 const COLOR_PLAYER_SPEED_FOREGROUND: Color = GREEN;
 
@@ -101,6 +105,7 @@ pub fn draw_ui_debug(game_state: &GameState) {
 pub fn draw_ui(world: &World, game_state: &GameState, input: &String) {
     draw_spellbook(&world);
     draw_health(&game_state);
+    draw_shield(&game_state);
     draw_speed(&game_state);
     draw_description(&game_state);
     draw_input(&input);
@@ -127,6 +132,8 @@ fn draw_spellbook(world: &World) {
             let color = match v.get_type() {
                 crate::world::spell::SpellEffectType::Damage => COLOR_SPELL_DAMAGE,
                 crate::world::spell::SpellEffectType::Healing => COLOR_SPELL_HEALING,
+                crate::world::spell::SpellEffectType::Shield => COLOR_SPELL_SHIELD,
+                crate::world::spell::SpellEffectType::MultiDamage => COLOR_SPELL_MULTIDAMAGE,
             };
 
             utils::draw_text_with_shadow(
@@ -173,11 +180,43 @@ fn draw_health(game_state: &GameState) {
     );
 }
 
+fn draw_shield(game_state: &GameState) {
+    let shield = format!("{}", game_state.get_scene().get_player().shield());
+
+    draw_rectangle(
+        grid_24_width() * 3f32,
+        grid_12_height() * 4f32,
+        grid_24_width(),
+        grid_12_height() * 3f32 - grid_24_height(),
+        COLOR_PLAYER_SHIELD_BACKGROUND,
+    );
+
+    utils::draw_centered_text(
+        "Shield",
+        grid_24_width() * 3f32 + grid_48_width(),
+        grid_12_height() * 4f32 - grid_48_height(),
+        24,
+        WHITE,
+        1.0,
+        0.0,
+    );
+
+    utils::draw_centered_text(
+        &shield,
+        grid_24_width() * 3f32 + grid_48_width(),
+        grid_12_height() * 5f32,
+        24,
+        COLOR_PLAYER_SHIELD_FOREGROUND,
+        1.0,
+        0.0,
+    );
+}
+
 fn draw_speed(game_state: &GameState) {
     let speed = format!("{}", game_state.get_scene().get_player().get_speed());
 
     draw_rectangle(
-        grid_24_width() * 4f32,
+        grid_24_width() * 5f32,
         grid_12_height() * 4f32,
         grid_24_width(),
         grid_12_height() * 3f32 - grid_24_height(),
@@ -186,7 +225,7 @@ fn draw_speed(game_state: &GameState) {
 
     utils::draw_centered_text(
         "Speed",
-        (grid_24_width() + grid_48_width()) * 3f32,
+        grid_24_width() * 5f32 + grid_48_width(),
         grid_12_height() * 4f32 - grid_48_height(),
         24,
         WHITE,
@@ -196,7 +235,7 @@ fn draw_speed(game_state: &GameState) {
 
     utils::draw_centered_text(
         &speed,
-        (grid_24_width() + grid_48_width()) * 3f32,
+        grid_24_width() * 5f32 + grid_48_width(),
         grid_12_height() * 5f32,
         24,
         COLOR_PLAYER_SPEED_FOREGROUND,

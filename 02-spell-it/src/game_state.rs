@@ -27,6 +27,14 @@ impl Stage {
         }
     }
 
+    fn inflict_damage_to_all(&mut self, spell_power: i16) {
+        self.enemies.iter_mut().for_each(|e| {
+            if e.is_alive() {
+                e.inflict_damage(spell_power)
+            }
+        });
+    }
+
     pub fn are_all_dead(&self) -> bool {
         self.enemies.iter().all(|e| e.is_alive() == false)
     }
@@ -142,6 +150,26 @@ impl Scene {
                         self.player.heal(spell_power);
 
                         GameStateUpdateResult::NextTurn
+                    }
+                    SpellEffectType::Shield => {
+                        let spell_power = spell.get_base_power() as i16;
+
+                        self.player.increase_shield(spell_power);
+
+                        GameStateUpdateResult::NextTurn
+                    }
+                    SpellEffectType::MultiDamage => {
+                        let spell_power = spell.get_base_power() as i16;
+
+                        stage.inflict_damage_to_all(spell_power);
+
+                        if stage.are_all_dead() {
+                            crate::debug!("All Dead");
+                            GameStateUpdateResult::NextStage
+                        } else {
+                            crate::debug!("Not all dead");
+                            GameStateUpdateResult::NextTurn
+                        }
                     }
                 },
             },

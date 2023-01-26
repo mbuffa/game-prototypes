@@ -2,6 +2,8 @@
 pub enum SpellEffectType {
     Damage,
     Healing,
+    Shield,
+    MultiDamage,
 }
 
 #[derive(Clone)]

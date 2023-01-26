@@ -18,6 +18,7 @@ pub struct Entity {
     entity_type: EntityType,
     health_max: i16,
     health: i16,
+    shield: i16,
     damage: u8,
     speed: u8,
     is_alive: bool,
@@ -31,6 +32,7 @@ impl Entity {
                 entity_type,
                 health_max: base_health as i16,
                 health: base_health as i16,
+                shield: 0,
                 damage: 0,
                 speed,
                 is_alive: true,
@@ -43,6 +45,7 @@ impl Entity {
                     entity_type,
                     health: total_health,
                     health_max: total_health,
+                    shield: 0,
                     damage: (base_damage as f32 * (1f32 + potential)) as u8,
                     speed,
                     is_alive: true,
@@ -56,6 +59,7 @@ impl Entity {
                     entity_type,
                     health: (base_health as f32 * (1f32 + potential)) as i16,
                     health_max: total_health,
+                    shield: 0,
                     damage: (base_damage as f32 * (1f32 + potential)) as u8,
                     speed,
                     is_alive: true,
@@ -69,6 +73,7 @@ impl Entity {
                     entity_type,
                     health: (base_health as f32 * (1f32 + potential)) as i16,
                     health_max: total_health,
+                    shield: 0,
                     damage: (base_damage as f32 * (1f32 + potential)) as u8,
                     speed,
                     is_alive: true,
@@ -102,14 +107,38 @@ impl Entity {
     }
 
     pub fn heal(&mut self, amount: i16) {
-        let final_amount = self.health_max - self.health + amount;
-        self.health += final_amount;
+        let mut final_amount = self.health + amount;
+
+        if final_amount > self.health_max {
+            final_amount = self.health_max;
+        }
+
+        self.health = final_amount;
+    }
+
+    pub fn increase_shield(&mut self, amount: i16) {
+        self.shield = amount;
     }
 
     pub fn inflict_damage(&mut self, amount: i16) {
         crate::debug!("Inflicting {} to {}", amount, self.identifier);
 
-        self.health -= amount;
+        let mut mitigated_amount = amount;
+
+        if self.shield > 0 {
+            mitigated_amount -= self.shield;
+            self.shield -= amount;
+        }
+
+        if self.shield < 0 {
+            self.shield = 0;
+        }
+
+        if mitigated_amount < 0 {
+            mitigated_amount = 0;
+        }
+
+        self.health -= mitigated_amount;
 
         if self.health <= 0 {
             self.is_alive = false;
@@ -119,5 +148,9 @@ impl Entity {
 
     pub fn damage(&self) -> &u8 {
         &self.damage
+    }
+
+    pub fn shield(&self) -> &i16 {
+        &self.shield
     }
 }
