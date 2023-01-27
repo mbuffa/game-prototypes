@@ -30,7 +30,7 @@ impl Stage {
     fn inflict_damage_to_all(&mut self, spell_power: i16) {
         self.enemies.iter_mut().for_each(|e| {
             if e.is_alive() {
-                e.inflict_damage(spell_power)
+                e.inflict_damage(spell_power);
             }
         });
     }
@@ -41,6 +41,10 @@ impl Stage {
 
     pub fn get_description(&self) -> &String {
         &self.description
+    }
+
+    pub fn set_description(&mut self, description: &str) {
+        self.description = description.to_owned();
     }
 
     pub fn get_number(&self) -> &u8 {
@@ -82,6 +86,10 @@ impl Scene {
         self.stages.last_mut()
     }
 
+    pub fn player_and_stage_mut(&mut self) -> (&mut Entity, Option<&mut Stage>) {
+        (&mut self.player, self.stages.last_mut())
+    }
+
     pub fn go_to_next_stage(&mut self) {
         self.stages.pop();
     }
@@ -92,20 +100,20 @@ impl Scene {
 
     pub fn initialize_stages(&mut self) {
         self.stages.push(Stage {
-            description: "A goblin. Shouldn't be too hard.".to_owned(),
+            description: "A goblin. Shouldn't be too hard...".to_owned(),
             number: 0,
             enemies: vec![Entity::new(EntityType::Goblin(10, 10, 0f32, 10))],
         });
 
         self.stages.push(Stage {
-            description: "Four more then. And a tougher one too!".to_owned(),
+            description: "Four little ones. But mama is here!".to_owned(),
             number: 1,
             enemies: vec![
                 Entity::new(EntityType::Goblin(100, 20, 0f32, 10)),
-                Entity::new(EntityType::Goblin(10, 10, 0f32, 10)),
-                Entity::new(EntityType::Goblin(10, 10, 0f32, 10)),
-                Entity::new(EntityType::Goblin(10, 10, 0f32, 10)),
-                Entity::new(EntityType::Goblin(10, 10, 0f32, 10)),
+                Entity::new(EntityType::Goblin(10, 5, 0f32, 10)),
+                Entity::new(EntityType::Goblin(10, 5, 0f32, 10)),
+                Entity::new(EntityType::Goblin(10, 5, 0f32, 10)),
+                Entity::new(EntityType::Goblin(10, 5, 0f32, 10)),
             ],
         });
 

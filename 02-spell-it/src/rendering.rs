@@ -108,7 +108,7 @@ pub fn draw_ui(world: &World, game_state: &GameState, input: &String) {
     draw_shield(&game_state);
     draw_speed(&game_state);
     draw_description(&game_state);
-    draw_input(&input);
+    draw_input(&game_state, &input);
 }
 
 fn draw_spellbook(world: &World) {
@@ -269,7 +269,7 @@ fn draw_description(game_state: &GameState) {
     );
 }
 
-fn draw_input(input: &String) {
+fn draw_input(_game_state: &GameState, input: &String) {
     draw_rectangle(
         grid_12_width() * 4f32,
         grid_12_height() * 9f32,

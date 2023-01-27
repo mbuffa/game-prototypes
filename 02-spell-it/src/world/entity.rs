@@ -15,6 +15,7 @@ pub enum EntityType {
 
 pub struct Entity {
     identifier: String,
+    name: String,
     entity_type: EntityType,
     health_max: i16,
     health: i16,
@@ -29,6 +30,7 @@ impl Entity {
         match entity_type {
             EntityType::Avatar(base_health, speed) => Self {
                 identifier: utils::generate_identifier("avt"),
+                name: "Avatar".to_owned(),
                 entity_type,
                 health_max: base_health as i16,
                 health: base_health as i16,
@@ -42,6 +44,7 @@ impl Entity {
 
                 Self {
                     identifier: utils::generate_identifier("gob"),
+                    name: "Goblin".to_owned(),
                     entity_type,
                     health: total_health,
                     health_max: total_health,
@@ -56,6 +59,7 @@ impl Entity {
 
                 Self {
                     identifier: utils::generate_identifier("orc"),
+                    name: "Orc".to_owned(),
                     entity_type,
                     health: (base_health as f32 * (1f32 + potential)) as i16,
                     health_max: total_health,
@@ -70,6 +74,7 @@ impl Entity {
 
                 Self {
                     identifier: utils::generate_identifier("suc"),
+                    name: "Succubus".to_owned(),
                     entity_type,
                     health: (base_health as f32 * (1f32 + potential)) as i16,
                     health_max: total_health,
@@ -120,7 +125,7 @@ impl Entity {
         self.shield = amount;
     }
 
-    pub fn inflict_damage(&mut self, amount: i16) {
+    pub fn inflict_damage(&mut self, amount: i16) -> (i16, i16) {
         crate::debug!("Inflicting {} to {}", amount, self.identifier);
 
         let mut mitigated_amount = amount;
@@ -144,6 +149,8 @@ impl Entity {
             self.is_alive = false;
             crate::debug!("BOOM");
         }
+
+        (mitigated_amount, amount - mitigated_amount)
     }
 
     pub fn damage(&self) -> &u8 {
@@ -152,5 +159,9 @@ impl Entity {
 
     pub fn shield(&self) -> &i16 {
         &self.shield
+    }
+
+    pub fn name(&self) -> &str {
+        self.name.as_ref()
     }
 }

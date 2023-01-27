@@ -1,7 +1,7 @@
 # To-do
 * [x] Implement core architecture, rules and mechanics
 * [x] Implement basic UI
-* [ ] Implement a turn-based combat system
+* [x] Implement a turn-based combat system
   * [x] Order actors depending on their speed
   * [x] Add Turns
     * Capture input only when it's the player's turn
@@ -9,6 +9,7 @@
   * [x] Enemy attacks (decreasing player health)
   * [ ] Enemy moves (buffs, heals, debuffs)
 * [ ] Add advanced AI (buff skill)
+* [x] Add transitions between sequences and turns
 * [ ] Add a combat log (to be displayed instead of the stage description when the combat is on)
 * Implement spells:
   * [ ] (Hidden) Death (wipes everything, for debug purposes)
