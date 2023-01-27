@@ -102,18 +102,18 @@ impl Scene {
         self.stages.push(Stage {
             description: "A goblin. Shouldn't be too hard...".to_owned(),
             number: 0,
-            enemies: vec![Entity::new(EntityType::Goblin(10, 10, 0f32, 10))],
+            enemies: vec![Entity::new(EntityType::Goblin(10, 8, 0f32, 10))],
         });
 
         self.stages.push(Stage {
             description: "Four little ones. But mama is here!".to_owned(),
             number: 1,
             enemies: vec![
-                Entity::new(EntityType::Goblin(100, 20, 0f32, 10)),
-                Entity::new(EntityType::Goblin(10, 5, 0f32, 10)),
-                Entity::new(EntityType::Goblin(10, 5, 0f32, 10)),
-                Entity::new(EntityType::Goblin(10, 5, 0f32, 10)),
-                Entity::new(EntityType::Goblin(10, 5, 0f32, 10)),
+                Entity::new(EntityType::Goblin(70, 12, 0f32, 10)),
+                Entity::new(EntityType::Goblin(10, 8, 0f32, 10)),
+                Entity::new(EntityType::Goblin(10, 8, 0f32, 10)),
+                Entity::new(EntityType::Goblin(10, 8, 0f32, 10)),
+                Entity::new(EntityType::Goblin(10, 8, 0f32, 10)),
             ],
         });
 
@@ -121,8 +121,8 @@ impl Scene {
             description: "Orcs...!".to_owned(),
             number: 2,
             enemies: vec![
-                Entity::new(EntityType::Orc(40, 25, 0f32, 10)),
-                Entity::new(EntityType::Orc(40, 25, 0f32, 10)),
+                Entity::new(EntityType::Orc(40, 14, 0f32, 10)),
+                Entity::new(EntityType::Orc(40, 14, 0f32, 10)),
             ],
         });
 
@@ -205,6 +205,8 @@ pub struct GameState {
     scene: Scene,
     is_over: bool,
     is_won: bool,
+    is_player_turn: bool,
+    in_transition: bool,
 }
 
 impl GameState {
@@ -216,6 +218,8 @@ impl GameState {
             },
             is_over: false,
             is_won: false,
+            is_player_turn: false,
+            in_transition: false,
         }
     }
 
@@ -245,5 +249,17 @@ impl GameState {
 
     pub fn get_scene_mut(&mut self) -> &mut Scene {
         &mut self.scene
+    }
+
+    pub fn is_player_turn(&self) -> bool {
+        self.is_player_turn
+    }
+
+    pub fn set_is_player_turn(&mut self, is_player_turn: bool) {
+        self.is_player_turn = is_player_turn;
+    }
+
+    pub fn set_in_transition(&mut self, in_transition: bool) {
+        self.in_transition = in_transition;
     }
 }

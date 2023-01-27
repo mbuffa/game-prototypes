@@ -25,7 +25,7 @@ impl World {
             "heal".to_owned(),
             Spell {
                 effect_type: SpellEffectType::Healing,
-                effect_base_power: 25,
+                effect_base_power: 35,
             },
         );
 
@@ -41,7 +41,7 @@ impl World {
             "shield".to_owned(),
             Spell {
                 effect_type: SpellEffectType::Shield,
-                effect_base_power: 33,
+                effect_base_power: 50,
             },
         );
 
@@ -49,7 +49,7 @@ impl World {
             "multi".to_owned(),
             Spell {
                 effect_type: SpellEffectType::MultiDamage,
-                effect_base_power: 4,
+                effect_base_power: 255,
             },
         );
     }

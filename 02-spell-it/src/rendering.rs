@@ -58,16 +58,36 @@ fn grid_48_height() -> f32 {
     screen_height() / 48f32
 }
 
-pub fn draw_victory_screen() {
+pub fn draw_victory_screen(transition_time: &f32) {
     clear_background(BLACK);
 
     utils::draw_centered_text("VICTORY!", center_x(), center_y(), 128, YELLOW, 1.0, 0.0);
+    
+    utils::draw_centered_text(
+        format!("Restarting in {}s...", *transition_time as u8).as_str(),
+        center_x(),
+        center_y() + (grid_12_height() * 2f32),
+        48,
+        WHITE,
+        1.0,
+        0.0
+    );
 }
 
-pub fn draw_defeat_screen() {
+pub fn draw_defeat_screen(transition_time: &f32) {
     clear_background(BLACK);
 
     utils::draw_centered_text("YOU DIED", center_x(), center_y(), 128, YELLOW, 1.0, 0.0);
+
+    utils::draw_centered_text(
+        format!("Restarting in {}s...", *transition_time as u8).as_str(),
+        center_x(),
+        center_y() + (grid_12_height() * 2f32),
+        48,
+        WHITE,
+        1.0,
+        0.0
+    );
 }
 
 pub fn draw_game_screen(world: &World, game_state: &GameState, input: &String) {
@@ -123,6 +143,16 @@ fn draw_spellbook(world: &World) {
         COLOR_SPELLBOOK,
     );
 
+    utils::draw_centered_text(
+        "Spellbook",
+        pos.0 + (grid_12_width() * 1.5f32),
+        pos.1 + grid_48_height(),
+        24,
+        BLACK, 
+        1.0,
+        0.0
+    );
+
     // Spells
     world
         .get_spell_types()
@@ -139,7 +169,7 @@ fn draw_spellbook(world: &World) {
             utils::draw_text_with_shadow(
                 k,
                 pos.0 + SPELL_X_PADDING,
-                (pos.1 + grid_12_height() / 2f32) + grid_12_height() / 2f32 * i as f32,
+                (pos.1 + grid_12_height()) + grid_12_height() / 2f32 * i as f32,
                 SPELL_FONT_SIZE,
                 color,
                 0.5f32,
@@ -269,7 +299,7 @@ fn draw_description(game_state: &GameState) {
     );
 }
 
-fn draw_input(_game_state: &GameState, input: &String) {
+fn draw_input(game_state: &GameState, input: &String) {
     draw_rectangle(
         grid_12_width() * 4f32,
         grid_12_height() * 9f32,
@@ -277,6 +307,18 @@ fn draw_input(_game_state: &GameState, input: &String) {
         grid_12_height() * 2f32,
         COLOR_INPUT_BACKGROUND,
     );
+
+    if game_state.is_player_turn() {
+        utils::draw_centered_text(
+            "TYPE YOUR SPELL",
+            grid_12_width() * 7.5f32,
+            grid_12_height() * 10f32,
+            64,
+            Color::from_rgba(210, 80, 80, 80),
+            1.0,
+            0.0,
+        );
+    }
 
     draw_text(
         input,

@@ -7,8 +7,8 @@ use crate::world::World;
 
 use macroquad::prelude::*;
 
-const TIME_FOR_SEQUENCE_TRANSITION: f32 = 2f32;
-const TIME_FOR_STAGE_TRANSITION: f32 = 3f32;
+const TIME_FOR_SEQUENCE_TRANSITION: f32 = 0.5f32;
+const TIME_FOR_STAGE_TRANSITION: f32 = 2f32;
 
 enum CombatState {
     Idle,
@@ -159,7 +159,7 @@ impl GameMaster {
     }
 
     fn calculate_sequence(&mut self) {
-        crate::debug!("Enterijg calculate_sequence");
+        crate::debug!("Entering calculate_sequence");
         let scene = self.game_state.get_scene();
 
         match scene.get_current_stage() {
@@ -182,23 +182,28 @@ impl GameMaster {
             self.transition_time += get_frame_time();
         }
 
+        systems::maybe_mark_game_as_over_or_won(&mut self.game_state);
+
         if systems::can_go_to_next_stage(&mut self.game_state) {
             // Starting transition
             if self.in_transition == false {
                 set_description(&mut self.game_state, "Let's go forward!");
                 self.in_transition = true;
+                self.game_state.set_in_transition(true);
             }
 
             // Achieving transition
             if self.in_transition && self.transition_time >= TIME_FOR_STAGE_TRANSITION {
                 self.in_transition = false;
+                self.game_state.set_in_transition(false);
                 self.transition_time = 0f32;
                 self.game_state.get_scene_mut().go_to_next_stage();
-                self.calculate_sequence();
+
+                if let Some(_) = self.game_state.get_scene().get_current_stage() {
+                    self.calculate_sequence();
+                }
             }
         }
-
-        systems::maybe_mark_game_as_over_or_won(&mut self.game_state);
 
         if self.game_state.is_won() {
             // crate::debug!("You won!");
@@ -211,8 +216,12 @@ impl GameMaster {
 
             match &self.sequence {
                 Some(sequence) => {
-                    if sequence.in_transition() == false {
+                    if sequence.in_transition() {
+                        self.game_state.set_in_transition(true);
+                        self.game_state.set_is_player_turn(false);
+                    } else {
                         self.update_combat_system();
+                        self.game_state.set_in_transition(false);
                     }
                 }
                 None => {}
@@ -226,34 +235,31 @@ impl GameMaster {
         // crate::debug!("Entering update_combat_state");
         let player_identifier = self.player_identifier.as_ref().expect("Yolo");
 
-        match &mut self.sequence {
-            None => panic!("Holy cwap"),
-            Some(sequence) => {
-                sequence.tick();
+        if let Some(sequence) = &mut self.sequence {
+            sequence.tick();
 
-                match sequence.get_order().get(sequence.current()) {
-                    None => {
-                        // crate::debug!("Sequence end reached");
-                        // crate::debug!("{:?}", sequence.order);
-                        sequence.reset();
+            match sequence.get_order().get(sequence.current()) {
+                None => {
+                    // crate::debug!("Sequence end reached");
+                    // crate::debug!("{:?}", sequence.order);
+                    sequence.reset();
 
-                        match sequence.get_order().get(sequence.current()) {
-                            None => panic!("Hole sheet"),
-                            Some((identifier, _speed)) => {
-                                if identifier == player_identifier {
-                                    sequence.set_state(CombatState::PlayerTurn);
-                                } else {
-                                    sequence.set_state(CombatState::EnemyTurn);
-                                }
+                    match sequence.get_order().get(sequence.current()) {
+                        None => panic!("Hole sheet"),
+                        Some((identifier, _speed)) => {
+                            if identifier == player_identifier {
+                                sequence.set_state(CombatState::PlayerTurn);
+                            } else {
+                                sequence.set_state(CombatState::EnemyTurn);
                             }
                         }
                     }
-                    Some((identifier, _speed)) => {
-                        if identifier == player_identifier {
-                            sequence.set_state(CombatState::PlayerTurn);
-                        } else {
-                            sequence.set_state(CombatState::EnemyTurn);
-                        }
+                }
+                Some((identifier, _speed)) => {
+                    if identifier == player_identifier {
+                        sequence.set_state(CombatState::PlayerTurn);
+                    } else {
+                        sequence.set_state(CombatState::EnemyTurn);
                     }
                 }
             }
@@ -267,11 +273,16 @@ impl GameMaster {
             Some(sequence) => {
                 match sequence.get_state() {
                     CombatState::Idle => {
+                        self.game_state.set_is_player_turn(false);
                         crate::debug!("Combat Idle");
                     }
                     CombatState::PlayerTurn => {
+                        self.game_state.set_is_player_turn(true);
+
                         if is_key_pressed(KeyCode::Enter) {
                             let sanitized = systems::sanitize_input(&self.player_input);
+
+                            self.game_state.set_in_transition(true);
 
                             if systems::validate_input(&self.world, &sanitized) {
                                 match systems::execute_input(
@@ -296,6 +307,8 @@ impl GameMaster {
                         }
                     }
                     CombatState::EnemyTurn => {
+                        self.game_state.set_is_player_turn(false);
+
                         let scene: &mut Scene = self.game_state.get_scene_mut();
                         let (player, current_stage) = scene.player_and_stage_mut();
 

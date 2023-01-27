@@ -305,25 +305,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6f61fba1741ea2b3d6a1e3178721804bb716a68a6aeba1149b5d52e3d464ea66"
 
 [[package]]
-name = "openal"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "76b816b719df333083f8a4584fa62d00e8d0a2326e72f57f1e86e44d292a8b48"
-dependencies = [
- "libc",
- "openal-sys",
-]
-
-[[package]]
-name = "openal-sys"
-version = "1.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b521c35ac1eed54f0c97f88739aa61d29991ceff3b626af62d33607dbb47e01f"
-dependencies = [
- "libc",
-]
-
-[[package]]
 name = "png"
 version = "0.17.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -377,7 +358,6 @@ name = "spell-it"
 version = "0.1.0"
 dependencies = [
  "macroquad",
- "openal",
 ]
 
 [[package]]
