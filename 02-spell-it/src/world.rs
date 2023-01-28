@@ -49,7 +49,7 @@ impl World {
             "multi".to_owned(),
             Spell {
                 effect_type: SpellEffectType::MultiDamage,
-                effect_base_power: 255,
+                effect_base_power: 4,
             },
         );
     }
