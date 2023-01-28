@@ -92,10 +92,8 @@ impl Scene {
                         stage.inflict_damage(spell_power);
                         
                         if stage.are_all_dead() {
-                            crate::debug!("All Dead");
                             GameStateUpdateResult::NextStage
                         } else {
-                            crate::debug!("Not all dead");
                             GameStateUpdateResult::NextTurn
                         }
                     }
@@ -119,10 +117,8 @@ impl Scene {
                         stage.inflict_damage_to_all(spell_power);
                         
                         if stage.are_all_dead() {
-                            crate::debug!("All Dead");
                             GameStateUpdateResult::NextStage
                         } else {
-                            crate::debug!("Not all dead");
                             GameStateUpdateResult::NextTurn
                         }
                     }

@@ -7,8 +7,6 @@ pub fn sanitize_input(input: &String) -> String {
 }
 
 pub fn validate_input(world: &World, input: &String) -> bool {
-    crate::debug!("{:?}", world.get_spell_types().keys());
-
     world.get_spell_types().keys().any(|k| k == input)
 }
 

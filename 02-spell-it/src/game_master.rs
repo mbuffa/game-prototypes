@@ -58,7 +58,6 @@ impl GameMaster {
     }
 
     fn calculate_sequence(&mut self) {
-        crate::debug!("Entering calculate_sequence");
         let scene = self.game_state.get_scene();
 
         match scene.get_current_stage() {
@@ -105,10 +104,8 @@ impl GameMaster {
         }
 
         if self.game_state.is_won() {
-            // crate::debug!("You won!");
             // FIXME: Play victory sound.
         } else if self.game_state.is_over() {
-            // crate::debug!("You lost!");
             // FIXME: Play defeat sound.
         } else {
             self.update_combat_state();
@@ -131,7 +128,6 @@ impl GameMaster {
     }
 
     fn update_combat_state(&mut self) {
-        // crate::debug!("Entering update_combat_state");
         let player_identifier = self.player_identifier.as_ref().expect("Yolo");
 
         if let Some(sequence) = &mut self.sequence {
@@ -139,8 +135,6 @@ impl GameMaster {
 
             match sequence.get_order().get(sequence.current()) {
                 None => {
-                    // crate::debug!("Sequence end reached");
-                    // crate::debug!("{:?}", sequence.order);
                     sequence.reset();
 
                     match sequence.get_order().get(sequence.current()) {
@@ -166,14 +160,11 @@ impl GameMaster {
     }
 
     fn update_combat_system(&mut self) {
-        // crate::debug!("Entering update_combat_system");
-
         match &mut self.sequence {
             Some(sequence) => {
                 match sequence.get_state() {
                     CombatState::Idle => {
                         self.game_state.set_is_player_turn(false);
-                        crate::debug!("Combat Idle");
                     }
                     CombatState::PlayerTurn => {
                         self.game_state.set_is_player_turn(true);
@@ -184,13 +175,11 @@ impl GameMaster {
                             self.game_state.set_in_transition(true);
 
                             if systems::validate_input(&self.world, &sanitized) {
-                                match systems::execute_input(
+                                systems::execute_input(
                                     &self.world,
                                     &mut self.game_state,
                                     &sanitized,
-                                ) {
-                                    _ => crate::debug!("Updated Scene."),
-                                }
+                                );
 
                                 self.player_input = String::new();
                                 sequence.next();

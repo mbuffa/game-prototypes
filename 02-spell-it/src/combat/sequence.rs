@@ -33,10 +33,8 @@ impl Sequence {
           None => panic!("Something weird happened in Sequence draft."),
           Some((identifier, _)) => {
               if identifier == player.get_identifier() {
-                  crate::debug!("Player Turn");
                   CombatState::PlayerTurn
               } else {
-                  crate::debug!("Enemy Turn");
                   CombatState::EnemyTurn
               }
           }
@@ -73,20 +71,17 @@ impl Sequence {
 
   pub fn next(&mut self) {
       if self.in_transition == false {
-          println!("Started sequence transition");
           self.in_transition = true;
       }
   }
 
   fn go_next(&mut self) {
-      println!("Going to next");
       self.current += 1;
       self.in_transition = false;
       self.transition_time = 0f32;
   }
 
   pub fn reset(&mut self) {
-      println!("Reset");
       self.current = 0;
   }
 
@@ -96,7 +91,6 @@ impl Sequence {
       }
 
       if self.in_transition && self.transition_time >= TIME_FOR_SEQUENCE_TRANSITION {
-          println!("Reached elapsed time target");
           self.in_transition = false;
           self.transition_time = 0f32;
           self.go_next();

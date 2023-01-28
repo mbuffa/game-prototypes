@@ -126,8 +126,6 @@ impl Entity {
     }
 
     pub fn inflict_damage(&mut self, amount: i16) -> (i16, i16) {
-        crate::debug!("Inflicting {} to {}", amount, self.identifier);
-
         let mut mitigated_amount = amount;
 
         if self.shield > 0 {
@@ -147,7 +145,6 @@ impl Entity {
 
         if self.health <= 0 {
             self.is_alive = false;
-            crate::debug!("BOOM");
         }
 
         (mitigated_amount, amount - mitigated_amount)

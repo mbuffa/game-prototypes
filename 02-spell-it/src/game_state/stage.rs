@@ -8,17 +8,9 @@ pub struct Stage {
 
 impl Stage {
   pub fn inflict_damage(&mut self, amount: i16) {
-      crate::debug!(
-          "Inflicting damage {} on something {}",
-          amount,
-          self.enemies.len()
-      );
-
       let mut inflicted = false;
 
       for e in self.enemies.iter_mut() {
-          crate::debug!("YOLO");
-
           if e.is_alive() && inflicted == false {
               e.inflict_damage(amount);
               inflicted = true;
