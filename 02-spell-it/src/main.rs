@@ -1,12 +1,13 @@
 use game_master::GameMaster;
 use macroquad::prelude::*;
 
-mod game_master;
-mod game_state;
-mod rendering;
-mod systems;
 mod utils;
 mod world;
+mod combat;
+mod game_state;
+mod game_master;
+mod rendering;
+mod systems;
 
 use game_state::GameState;
 use world::World;

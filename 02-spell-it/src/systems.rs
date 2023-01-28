@@ -1,4 +1,4 @@
-use crate::game_state::{GameState, GameStateUpdateResult, Stage};
+use crate::game_state::{GameState, GameStateUpdateResult, stage::Stage};
 use crate::world::spell::{Spell, SpellEffectType};
 use crate::world::World;
 

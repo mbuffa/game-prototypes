@@ -1,119 +1,18 @@
 use crate::game_state::GameState;
-use crate::game_state::Scene;
+use crate::game_state::scene::Scene;
 use crate::systems;
 use crate::utils;
-use crate::world::entity::Entity;
 use crate::world::World;
+use crate::combat::sequence::{Sequence, CombatState};
 
 use macroquad::prelude::*;
 
-const TIME_FOR_SEQUENCE_TRANSITION: f32 = 0.5f32;
 const TIME_FOR_STAGE_TRANSITION: f32 = 2f32;
-
-enum CombatState {
-    Idle,
-    PlayerTurn,
-    EnemyTurn,
-}
 
 enum State {
     Uninitialized,
     Initialized,
     SequenceDrafted,
-}
-
-struct Sequence {
-    order: Vec<(String, u8)>,
-    state: CombatState,
-    current: usize,
-    in_transition: bool,
-    transition_time: f32,
-}
-
-impl Sequence {
-    pub fn from(player: &Entity, enemies: &Vec<Entity>) -> Self {
-        let mut order = Vec::new();
-
-        order.push((player.get_identifier().clone(), player.get_speed().clone()));
-        enemies
-            .iter()
-            .for_each(|e| order.push((e.get_identifier().clone(), e.get_speed().clone())));
-
-        order.sort_by(|a, b| b.1.cmp(&a.1));
-
-        let state = match order.first() {
-            None => panic!("Something weird happened in Sequence draft."),
-            Some((identifier, _)) => {
-                if identifier == player.get_identifier() {
-                    crate::debug!("Player Turn");
-                    CombatState::PlayerTurn
-                } else {
-                    crate::debug!("Enemy Turn");
-                    CombatState::EnemyTurn
-                }
-            }
-        };
-
-        Self {
-            order,
-            state,
-            current: 0,
-            in_transition: false,
-            transition_time: 0f32,
-        }
-    }
-
-    pub fn get_order(&self) -> &Vec<(String, u8)> {
-        &self.order
-    }
-
-    fn get_state(&self) -> &CombatState {
-        &self.state
-    }
-
-    fn set_state(&mut self, state: CombatState) {
-        self.state = state;
-    }
-
-    pub fn current(&self) -> usize {
-        self.current
-    }
-
-    pub fn in_transition(&self) -> bool {
-        self.in_transition
-    }
-
-    pub fn next(&mut self) {
-        if self.in_transition == false {
-            println!("Started sequence transition");
-            self.in_transition = true;
-        }
-    }
-
-    fn go_next(&mut self) {
-        println!("Going to next");
-        self.current += 1;
-        self.in_transition = false;
-        self.transition_time = 0f32;
-    }
-
-    pub fn reset(&mut self) {
-        println!("Reset");
-        self.current = 0;
-    }
-
-    pub fn tick(&mut self) {
-        if self.in_transition {
-            self.transition_time += get_frame_time();
-        }
-
-        if self.in_transition && self.transition_time >= TIME_FOR_SEQUENCE_TRANSITION {
-            println!("Reached elapsed time target");
-            self.in_transition = false;
-            self.transition_time = 0f32;
-            self.go_next();
-        }
-    }
 }
 
 pub struct GameMaster {
@@ -356,16 +255,6 @@ impl GameMaster {
                 panic!("No sequence.")
             }
         }
-    }
-
-    pub fn get_world(&self) -> &World {
-        &self.world
-    }
-    pub fn get_game_state(&self) -> &GameState {
-        &self.game_state
-    }
-    pub fn get_player_input(&self) -> &String {
-        &self.player_input
     }
 }
 
