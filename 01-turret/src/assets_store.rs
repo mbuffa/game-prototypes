@@ -71,7 +71,7 @@ impl AssetsStore {
     pub fn play_sound(&self, name: &str) {
         match self.sounds.get(name) {
             Some(sound) => {
-                // macroquad::audio::play_sound_once(*sound);
+                macroquad::audio::play_sound_once(sound);
             }
             None => {}
         }
