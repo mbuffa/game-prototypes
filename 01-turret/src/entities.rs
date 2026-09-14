@@ -1,4 +1,4 @@
-pub mod turret;
+pub mod laser;
 pub mod missile;
 pub mod monster;
-pub mod laser;
+pub mod turret;

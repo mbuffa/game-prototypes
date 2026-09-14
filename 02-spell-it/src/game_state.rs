@@ -1,5 +1,5 @@
-pub mod stage;
 pub mod scene;
+pub mod stage;
 
 use scene::Scene;
 

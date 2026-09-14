@@ -1,2 +1,4 @@
 /target
-/redist
+/redist/*
+!/redist/index.html
+!/redist/mq_js_bundle.js

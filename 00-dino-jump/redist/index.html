@@ -1,0 +1,29 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Dino Jump</title>
+    <style>
+        html,
+        body,
+        canvas {
+            margin: 0px;
+            padding: 0px;
+            width: 1024px;
+            height: 768px;
+            overflow: hidden;
+            position: absolute;
+            background: black;
+            z-index: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="glcanvas" tabindex='1'></canvas>
+    <!-- Vendored from macroquad 0.4.16's own js/mq_js_bundle.js, pinned to match the compiled wasm's ABI. -->
+    <script src="mq_js_bundle.js"></script>
+    <script>load("dino-jump.wasm");</script> <!-- Your compiled wasm file -->
+</body>
+
+</html>

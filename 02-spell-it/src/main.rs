@@ -1,13 +1,13 @@
 use game_master::GameMaster;
 use macroquad::prelude::*;
 
-mod utils;
-mod world;
 mod combat;
-mod game_state;
 mod game_master;
+mod game_state;
 mod rendering;
 mod systems;
+mod utils;
+mod world;
 
 use game_state::GameState;
 use world::World;
@@ -17,14 +17,14 @@ const TRANSITION_TIMER: f32 = 6f32;
 enum State {
     Intro,
     Playing,
-    GameOver
+    GameOver,
 }
 
 struct GameContext {
     master: GameMaster,
     state: State,
     in_transition: bool,
-    transition_time: f32
+    transition_time: f32,
 }
 
 impl GameContext {
@@ -33,7 +33,7 @@ impl GameContext {
             master: GameMaster::new(),
             state: State::Playing,
             in_transition: false,
-            transition_time: TRANSITION_TIMER
+            transition_time: TRANSITION_TIMER,
         }
     }
 
@@ -50,7 +50,7 @@ impl GameContext {
             }
         }
 
-        let(world, game_state, input) = self.master.update(since_last_frame);
+        let (world, game_state, input) = self.master.update(since_last_frame);
 
         draw(&self.transition_time, &world, &game_state, &input);
 
@@ -81,7 +81,7 @@ async fn main() {
     }
 }
 
-fn draw(context: &f32, world: &World, game_state: &GameState, input: &String) {    
+fn draw(context: &f32, world: &World, game_state: &GameState, input: &String) {
     if game_state.is_won() {
         rendering::draw_victory_screen(context);
     } else if game_state.is_over() {

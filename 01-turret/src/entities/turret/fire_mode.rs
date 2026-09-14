@@ -1,4 +1,4 @@
 pub enum FireMode {
-  Normal,
-  Burst
+    Normal,
+    Burst,
 }

@@ -1,9 +1,9 @@
-use crate::game_state::GameState;
+use crate::combat::sequence::{CombatState, Sequence};
 use crate::game_state::scene::Scene;
+use crate::game_state::GameState;
 use crate::systems;
 use crate::utils;
 use crate::world::World;
-use crate::combat::sequence::{Sequence, CombatState};
 
 use macroquad::prelude::*;
 

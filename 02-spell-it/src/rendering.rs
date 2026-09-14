@@ -62,7 +62,7 @@ pub fn draw_victory_screen(transition_time: &f32) {
     clear_background(BLACK);
 
     utils::draw_centered_text("VICTORY!", center_x(), center_y(), 128, YELLOW, 1.0, 0.0);
-    
+
     utils::draw_centered_text(
         format!("Restarting in {}s...", *transition_time as u8).as_str(),
         center_x(),
@@ -70,7 +70,7 @@ pub fn draw_victory_screen(transition_time: &f32) {
         48,
         WHITE,
         1.0,
-        0.0
+        0.0,
     );
 }
 
@@ -86,7 +86,7 @@ pub fn draw_defeat_screen(transition_time: &f32) {
         48,
         WHITE,
         1.0,
-        0.0
+        0.0,
     );
 }
 
@@ -148,9 +148,9 @@ fn draw_spellbook(world: &World) {
         pos.0 + (grid_12_width() * 1.5f32),
         pos.1 + grid_48_height(),
         24,
-        BLACK, 
+        BLACK,
         1.0,
-        0.0
+        0.0,
     );
 
     // Spells
